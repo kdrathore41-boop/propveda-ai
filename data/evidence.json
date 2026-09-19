@@ -1,0 +1,4 @@
+[
+  {"id":"ev_demo_001","propertyId":"prop_demo_001","dimension":"TITLE","observation":"Sample evidence placeholder; no title conclusion is made.","source":"Demo source","reference":"","observedAt":"2026-09-16T00:00:00.000Z","status":"NOT_CHECKED","confidence":"UNKNOWN","notes":"Replace with an authoritative record before decision use.","createdAt":"2026-09-16T00:00:00.000Z"},
+  {"id":"ev_demo_002","propertyId":"prop_demo_001","dimension":"PLANNING","observation":"Planning evidence has not yet been collected.","source":"Not checked","reference":"","observedAt":"2026-09-16T00:00:00.000Z","status":"NOT_CHECKED","confidence":"UNKNOWN","notes":"No evidence is not negative evidence.","createdAt":"2026-09-16T00:00:00.000Z"}
+]

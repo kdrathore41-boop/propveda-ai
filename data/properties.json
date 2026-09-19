@@ -1,0 +1,15 @@
+[
+  {
+    "id": "prop_demo_001",
+    "propertyId": "PV-JBP-DEMO-001",
+    "name": "Sample Property — Tilhari",
+    "location": "Tilhari, Jabalpur, Madhya Pradesh",
+    "district": "Jabalpur",
+    "tehsil": "Jabalpur",
+    "khasra": "DEMO-KHASRA",
+    "coordinates": null,
+    "project": "Demo Project",
+    "developer": "Demo / Unverified",
+    "createdAt": "2026-09-16T00:00:00.000Z"
+  }
+]
