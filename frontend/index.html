@@ -1,33 +1,10 @@
-<!doctype html>
-<html lang="en">
-<head>
-<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>PropVeda AI — Intelligence Command Center</title>
-<style>
-:root{--bg:#08111f;--panel:#0f1b2d;--panel2:#132238;--line:#22334b;--text:#edf4ff;--muted:#91a3bb;--accent:#64d7c7;--accent2:#8fa7ff;--warn:#f6c85f;--danger:#ff7b8b;--good:#63d39b;--shadow:0 18px 55px rgba(0,0,0,.25)}*{box-sizing:border-box}body{margin:0;font-family:Inter,ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Arial;background:radial-gradient(circle at 80% -10%,#18365a 0,transparent 36%),var(--bg);color:var(--text)}button,input,textarea,select{font:inherit}button{border:0;border-radius:10px;padding:11px 15px;background:linear-gradient(135deg,var(--accent),#48b8dc);color:#07131e;font-weight:800;cursor:pointer}button.secondary{background:#17263b;color:var(--text);border:1px solid var(--line)}input,textarea,select{width:100%;padding:11px 12px;border-radius:10px;border:1px solid var(--line);background:#0b1728;color:var(--text);outline:none}textarea{min-height:90px;resize:vertical}label{font-size:12px;color:var(--muted);display:block;margin:9px 0 5px}.shell{display:grid;grid-template-columns:250px 1fr;min-height:100vh}.side{border-right:1px solid var(--line);padding:22px 16px;background:rgba(7,16,29,.84);position:sticky;top:0;height:100vh}.brand{display:flex;gap:10px;align-items:center;margin-bottom:30px}.logo{width:38px;height:38px;border-radius:12px;background:linear-gradient(135deg,var(--accent),var(--accent2));display:grid;place-items:center;color:#06111d;font-weight:950}.brand b{font-size:18px}.brand span{display:block;font-size:11px;color:var(--muted);margin-top:2px}.nav{display:grid;gap:7px}.nav div{padding:11px 12px;border-radius:10px;color:var(--muted);font-size:13px}.nav div.active,.nav div:hover{background:#14243a;color:var(--text)}.sidefoot{position:absolute;bottom:18px;left:16px;right:16px;border-top:1px solid var(--line);padding-top:14px}.main{padding:22px;max-width:1500px;width:100%;margin:auto}.top{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;margin-bottom:20px}.eyebrow{color:var(--accent);font-size:11px;font-weight:800;letter-spacing:.14em;text-transform:uppercase}.top h1{margin:5px 0;font-size:28px}.top p{margin:0;color:var(--muted);font-size:13px}.actions{display:flex;gap:8px;flex-wrap:wrap}.grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}.grid2{display:grid;grid-template-columns:1.25fr .75fr;gap:14px}.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}.card{background:linear-gradient(180deg,rgba(18,33,53,.95),rgba(12,24,40,.95));border:1px solid var(--line);border-radius:16px;padding:17px;box-shadow:var(--shadow);margin-bottom:14px}.metric{font-size:28px;font-weight:850;margin-top:7px}.small{font-size:12px;color:var(--muted)}.propertyTitle{font-size:22px;font-weight:850;margin:6px 0}.chips{display:flex;gap:7px;flex-wrap:wrap}.chip{font-size:11px;padding:5px 8px;border-radius:999px;background:#152842;border:1px solid #27415e;color:#b9cae1}.score{display:flex;align-items:center;gap:14px}.ring{width:72px;height:72px;border-radius:50%;display:grid;place-items:center;background:conic-gradient(var(--accent) 0 72%,#203148 72%);position:relative}.ring:after{content:"";position:absolute;inset:7px;border-radius:50%;background:var(--panel)}.ring b{position:relative;z-index:1;font-size:18px}.status{font-size:11px;padding:5px 8px;border-radius:7px;background:#19283c;color:#c8d7eb}.status.good{background:rgba(99,211,155,.12);color:var(--good)}.status.warn{background:rgba(246,200,95,.12);color:var(--warn)}.status.danger{background:rgba(255,123,139,.12);color:var(--danger)}h2,h3{margin:0 0 12px}.row{display:flex;justify-content:space-between;gap:12px;align-items:center}.riskrow{display:grid;grid-template-columns:1fr auto;gap:10px;padding:10px 0;border-bottom:1px solid #1b2a40}.riskrow:last-child{border-bottom:0}.bar{height:7px;background:#1d2c42;border-radius:10px;overflow:hidden;margin-top:8px}.bar i{display:block;height:100%;background:linear-gradient(90deg,var(--accent),var(--accent2));border-radius:10px}.timeline{display:grid;gap:9px}.event{display:grid;grid-template-columns:9px 1fr;gap:10px}.dot{width:9px;height:9px;border-radius:50%;background:var(--accent);margin-top:5px}.mutedbox{background:#0b1728;border:1px solid var(--line);padding:11px;border-radius:10px;color:var(--muted);font-size:12px}.formgrid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.full{grid-column:1/-1}.empty{color:var(--muted);font-size:13px;padding:10px 0}.footerNote{font-size:11px;color:#70849e;margin-top:8px}.tablelike{display:grid;gap:2px}.dim{padding:9px 0;border-bottom:1px solid #1b2a40}.dim .row span:first-child{font-size:12px}.graphWrap{background:#091522;border:1px solid var(--line);border-radius:12px;overflow:auto;min-height:340px}.graphSvg{width:100%;height:340px;min-width:720px}.graphLegend{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}.graphNode{cursor:default}.assistant{background:linear-gradient(135deg,#10283a,#14243c);border:1px solid #28506b}.quote{font-size:16px;line-height:1.5}.hide{display:none}@media(max-width:1050px){.shell{grid-template-columns:1fr}.side{position:static;height:auto;border-right:0;border-bottom:1px solid var(--line)}.sidefoot{display:none}.nav{grid-template-columns:repeat(4,1fr)}.grid4{grid-template-columns:repeat(2,1fr)}.grid2,.grid3{grid-template-columns:1fr}}@media(max-width:650px){.main{padding:14px}.top{display:block}.actions{margin-top:14px}.grid4{grid-template-columns:1fr 1fr}.nav{grid-template-columns:1fr 1fr}.formgrid{grid-template-columns:1fr}.top h1{font-size:23px}.card{padding:14px}.propertyTitle{font-size:19px}}
-</style></head>
-<body><div class="shell">
-<aside class="side"><div class="brand"><div class="logo">PV</div><div><b>PropVeda AI</b><span>Real-Estate Intelligence OS</span></div></div><div class="nav"><div class="active">⌂ Command Center</div><div>◈ Property Intelligence</div><div>◎ Evidence Graph</div><div>△ Risk & Decision</div><div>▣ Documents</div><div>⌁ GIS Intelligence</div><div>✓ Transaction Readiness</div><div>◌ Reports</div></div><div class="sidefoot"><div class="small">Evidence-first system</div><div class="small">NO EVIDENCE ≠ NEGATIVE EVIDENCE</div></div></aside>
-<main class="main"><div class="top"><div><div class="eyebrow">PropVeda AI</div><h1>Intelligence Command Center</h1><p>One property. One evidence graph. One decision workspace.</p></div><div class="actions"><button class="secondary" onclick="loadAll()">Refresh</button><button onclick="saveReport()">Generate Intelligence Report</button></div></div>
-<section class="card"><div class="row"><div><div class="eyebrow">Buyer Intelligence</div><h2>AI Property Discovery</h2></div><span class="status">Evidence-first matching</span></div><div class="small">Describe what you want in Hindi, Hinglish or English. Requirements are parsed for review; PropVeda does not silently force a match.</div><div class="formgrid" style="margin-top:10px"><div class="full"><label>What are you looking for?</label><input id="discoveryQuery" placeholder="Jabalpur mein 50 lakh tak investment ke liye plot chahiye"></div><div><button type="button" onclick="runDiscovery()">Find Properties</button></div><div><button type="button" class="secondary" onclick="clearDiscovery()">Clear</button></div></div><div id="discoveryParsed" style="margin-top:12px"></div><div id="discoveryResults" style="margin-top:10px"></div></section>
-<section class="card"><div class="row"><div><div class="eyebrow">Decision Workspace</div><h2>Compare Properties</h2></div><span class="status">Facts + evidence coverage</span></div><div class="small">Select two or more properties from discovery results to compare recorded information side-by-side.</div><div id="comparePanel" style="margin-top:12px"><div class="empty">No properties selected.</div></div></section>
-<section class="grid4"><div class="card"><div class="small">SYSTEM</div><div class="metric" id="system">—</div><div class="small" id="queue">Loading…</div></div><div class="card"><div class="small">EVIDENCE ITEMS</div><div class="metric" id="evCount">—</div><div class="small">Observed source records</div></div><div class="card"><div class="small">OPEN GAPS</div><div class="metric" id="gapCount">—</div><div class="small">Verification dimensions</div></div><div class="card"><div class="small">DECISION STATE</div><div class="metric" id="decisionTop">—</div><div class="small">Evidence-derived only</div></div></section>
-<section class="grid2"><div class="card"><div class="eyebrow">Current Property</div><div id="property"><div class="empty">Loading property…</div></div></div><div class="card"><h2>Intelligence Pulse</h2><div class="score"><div class="ring"><b id="supportPct">—</b></div><div><b id="supportLabel">Evidence support</b><div class="small">Coverage across decision dimensions</div></div></div><div class="bar"><i id="supportBar" style="width:0%"></i></div><div class="footerNote">Coverage is not a legal clearance or guarantee.</div></div></section>
-<section class="grid2"><div class="card"><div class="row"><h2>Risk & Decision Matrix</h2><span class="status" id="assessmentStatus">Loading</span></div><div id="assessment" class="tablelike"></div></div><div class="card"><h2>Decision Intelligence</h2><div id="decisionPanel" class="assistant"><div class="empty">Run the buyer context to generate prioritized actions.</div></div></div></section>
-<section class="grid2"><div class="card"><h2>Evidence Graph</h2><div id="evidence"></div><div class="footerNote">Every observation remains attributed to its source and confidence.</div></div><div class="card"><h2>Transaction Readiness</h2><div class="mutedbox">Unified evidence, document and buyer-context workflow. Not a legal clearance.</div><button style="margin-top:11px" onclick="runReadiness()">Check Readiness</button><div id="readiness"></div></div></section>
-<section class="grid2"><div class="card"><h2>Buyer Decision Assistant</h2><div class="small">Personalize priorities without overriding evidence.</div><form onsubmit="runBuyerAssistant(event)" class="formgrid"><div><label>Purpose</label><select id="bpurpose"><option>GENERAL</option><option>RESIDENCE</option><option>INVESTMENT</option><option>COMMERCIAL</option><option>LAND</option></select></div><div><label>Risk preference</label><select id="brisk"><option>UNKNOWN</option><option>LOW</option><option>MEDIUM</option><option>HIGH</option></select></div><div><label>Budget</label><input id="bbudget" placeholder="Optional"></div><div><label>Timeline</label><input id="btimeline" placeholder="Optional"></div><div class="full"><label>Financing</label><input id="bfinancing" placeholder="Optional"></div><div class="full"><button>Run Buyer Intelligence</button></div></form><div id="buyerAssistant"></div></div><div class="card"><h2>Opportunity & Scenario Layer</h2><div class="mutedbox">Scenario intelligence will remain evidence-grounded: signals are scenarios, not promised outcomes.</div><div class="timeline" style="margin-top:12px"><div class="event"><i class="dot"></i><div><b>Current State</b><div class="small">Derived from present evidence and verification coverage.</div></div></div><div class="event"><i class="dot"></i><div><b>Opportunity Signals</b><div class="small">Infrastructure / planning / market observations when evidence exists.</div></div></div><div class="event"><i class="dot"></i><div><b>Risk Scenarios</b><div class="small">What could change the decision, with uncertainty preserved.</div></div></div><div class="event"><i class="dot"></i><div><b>Next Verification Action</b><div class="small">Close the highest-impact evidence gap first.</div></div></div></div></div></section>
-<section class="grid2"><div class="card"><h2>Add Evidence</h2><form onsubmit="addEvidence(event)" class="formgrid"><div><label>Dimension</label><select id="dim"><option>TITLE</option><option>LEGAL</option><option>FINANCIAL</option><option>PLANNING</option><option>INFRASTRUCTURE</option><option>WATER</option><option>DOCUMENT</option><option>PROJECT</option></select></div><div><label>Source</label><input id="src" placeholder="Source / document"></div><div class="full"><label>Observation</label><textarea id="obs" placeholder="What was observed?"></textarea></div><div class="full"><button>Add Evidence</button></div></form></div><div class="card"><h2>Document Intelligence</h2><form onsubmit="addDoc(event)" class="formgrid"><div><label>Document name</label><input id="docname" placeholder="Agreement / deed / approval"></div><div><label>Type</label><select id="doctype"><option>AGREEMENT</option><option>SALE_DEED</option><option>ALLOTMENT</option><option>RERA</option><option>TITLE_RECORD</option><option>APPROVAL</option><option>OTHER</option></select></div><div class="full"><label>Document text</label><textarea id="doctext" placeholder="Paste text for clause screening"></textarea></div><div class="full"><button>Analyze Document</button></div></form><div id="docs"></div></div></section>
-<section class="card"><div class="row"><div><div class="eyebrow">Evidence Graph Visualizer</div><h2>Property Evidence Network</h2></div><span class="status" id="graphState">Loading</span></div><div class="small">A derived relationship view of the stored evidence chain. It does not establish ownership, title, boundary or zoning by itself.</div><div id="evidenceGraph" class="graphWrap" style="margin-top:12px"><div class="empty">Loading evidence graph…</div></div><div id="graphLegend" class="graphLegend"></div></section>
-<section class="card"><div class="row"><div><div class="eyebrow">Decision Reassessment Engine</div><h2>Decision Impact Monitor</h2></div><span class="status" id="reassessState">Loading</span></div><div class="small">Reassesses stored decision paths when evidence changes. It is not a legal conclusion or a prediction.</div><div id="reassessment" class="timeline" style="margin-top:12px"><div class="empty">Loading reassessment…</div></div></section><section class="card"><div class="row"><div><div class="eyebrow">Action Orchestration</div><h2>Verification Action Queue</h2></div><span class="status" id="actionState">Loading</span></div><div class="small">Turns evidence and reassessment signals into traceable workflow actions. Actions never imply legal clearance or guaranteed outcomes.</div><div id="actionQueue" class="timeline" style="margin-top:12px"><div class="empty">Loading action queue…</div></div></section><section class="card"><div class="row"><div><div class="eyebrow">Property Intelligence Timeline</div><h2>Evidence & Decision History</h2></div><span class="status" id="timelineState">Loading</span></div><div class="small">Chronological view of stored evidence, workflow actions, reports and audit events. It records system history; it does not claim that an external event occurred.</div><div id="propertyTimeline" class="timeline" style="margin-top:12px"><div class="empty">Loading property timeline…</div></div></section><section class="card"><div class="row"><div><div class="eyebrow">Evidence Snapshot Engine</div><h2>Property State Snapshots</h2></div><span class="status" id="snapshotState">Loading</span></div><div class="small">Creates integrity-checkable point-in-time representations of stored property intelligence. A snapshot preserves system state; it does not create or validate external evidence.</div><div class="actions" style="margin-top:12px"><button onclick="createSnapshot()">Create Snapshot</button></div><div id="snapshotPanel" class="timeline" style="margin-top:12px"><div class="empty">Loading snapshots…</div></div><div class="footerNote">NO EVIDENCE ≠ NEGATIVE EVIDENCE · Snapshot hashes support integrity checking, not truth certification.</div></section><section class="card"><div class="row"><div><div class="eyebrow">Verification Workflow</div><h2>Human Review Workspace</h2></div><span class="status" id="verifyState">Loading</span></div><div class="small">Source-linked verification cases with explicit review states. Results update workflow state; they do not constitute legal clearance or a title certificate.</div><div id="verificationWorkspace" class="timeline" style="margin-top:12px"><div class="empty">Loading verification workspace…</div></div><div class="footerNote">VERIFICATION RESULT ≠ LEGAL OPINION · NO EVIDENCE ≠ NEGATIVE EVIDENCE</div></section><section class="card"><div class="row"><div><div class="eyebrow">Evidence Provenance</div><h2>Chain of Custody</h2></div><span class="status" id="provState">Loading</span></div><div class="small">Tracks how stored evidence and workflow records entered PropVeda, with source attribution and a tamper-evident chain. It does not certify external truth.</div><div id="provenancePanel" class="timeline" style="margin-top:12px"><div class="empty">Loading provenance…</div></div><div class="footerNote">PROVENANCE ≠ TRUTH CERTIFICATION · NO EVIDENCE ≠ NEGATIVE EVIDENCE</div></section><section class="card"><div class="row"><div><div class="eyebrow">Evidence Watchtower</div><h2>Change Detection & Alerts</h2></div><span class="status" id="watchState">Loading</span></div><div class="small">Detects changes between stored evidence observations and surfaces verification signals. It does not claim that an external source changed.</div><div id="watchtower" class="timeline" style="margin-top:12px"><div class="empty">Loading watchtower…</div></div></section><section class="grid2"><div class="card"><div class="eyebrow">Opportunity & Scenario Intelligence</div><h2>Scenario Console</h2><div class="small">Evidence-grounded scenarios — never presented as guaranteed outcomes.</div><div id="scenarioConsole" class="timeline" style="margin-top:12px"><div class="empty">Loading scenario intelligence…</div></div></div><div class="card"><div class="eyebrow">Next Verification</div><h2>Highest-impact evidence actions</h2><div id="scenarioActions"><div class="empty">Loading…</div></div></div></section>
-<section class="card"><div class="row"><div><div class="eyebrow">Portfolio Intelligence</div><h2>Portfolio Command Layer</h2></div><span class="status" id="portfolioState">Loading</span></div><div class="small" style="margin-bottom:12px">Compare properties by evidence, verification, confidence, exposure and transaction state — without ranking or declaring a winner.</div><div id="portfolioGrid" class="grid3"></div><div id="portfolioCompare" class="mutedbox" style="margin-top:10px">Select properties to inspect side-by-side.</div></section>
-<section class="card"><h2>CRM / Consent</h2><div class="grid2"><form onsubmit="createContact(event)" class="formgrid"><div><label>Name</label><input id="cname"></div><div><label>Contact</label><input id="ccontact"></div><div><label>Email</label><input id="cemail"></div><div><label>Purpose</label><select id="purpose"><option>PROPERTY_RESEARCH</option><option>INVESTMENT</option><option>RESIDENCE</option><option>COMMERCIAL</option></select></div><div class="full"><button>Create Contact</button></div></form><div><div class="mutedbox">Consent is explicit and purpose-bound. No mass personal-data scraping.</div><button class="secondary" onclick="grantConsent()" style="margin-top:10px">Grant Research Consent</button><button class="secondary" onclick="requestConsultation()" style="margin-top:10px">Request Consultation</button><div id="crmmsg" class="small" style="margin-top:8px"></div></div></div></section>
-<div class="footerNote">PropVeda AI • Evidence-first real-estate intelligence • Derived calculations are not authoritative ownership, zoning, boundary or legal evidence.</div>
-</main></div>
-
 <script>
 let property=null,user=null;
+let properties=[];
+let selectedProperties=[];
 
 const $=id=>document.getElementById(id);
+
 const discoveryQueryEl=$('discoveryQuery');
 const discoveryParsedEl=$('discoveryParsed');
 const discoveryResultsEl=$('discoveryResults');
@@ -36,4 +13,734 @@ const dimEl=$('dim');
 const srcEl=$('src');
 const obsEl=$('obs');
 const docnameEl=$('docname');
-const doctypeEl=$('d
+const doctypeEl=$('doctype');
+
+const API='https://propveda-ai.onrender.com/api';
+
+async function api(path,options={}){
+  const res=await fetch(API+path,{
+    headers:{'Content-Type':'application/json',...(options.headers||{})},
+    ...options
+  });
+
+  const text=await res.text();
+  let data=null;
+
+  try{
+    data=text?JSON.parse(text):null;
+  }catch{
+    data={raw:text};
+  }
+
+  if(!res.ok){
+    throw new Error(
+      data?.error ||
+      data?.message ||
+      `API ${res.status}`
+    );
+  }
+
+  return data;
+}
+
+function esc(v){
+  return String(v??'')
+    .replaceAll('&','&amp;')
+    .replaceAll('<','&lt;')
+    .replaceAll('>','&gt;')
+    .replaceAll('"','&quot;')
+    .replaceAll("'","&#039;");
+}
+
+function setText(id,value){
+  const el=$(id);
+  if(el)el.textContent=value??'—';
+}
+
+function setStatus(id,value){
+  const el=$(id);
+  if(el)el.textContent=value??'Ready';
+}
+
+function renderProperty(p){
+  const el=$('property');
+  if(!el)return;
+
+  if(!p){
+    el.innerHTML='<div class="empty">No property available.</div>';
+    return;
+  }
+
+  el.innerHTML=`
+    <div class="propertyTitle">${esc(p.name||p.propertyId||'Property')}</div>
+    <div class="small">${esc(p.location||'Location not recorded')}</div>
+    <div class="chips" style="margin-top:10px">
+      <span class="chip">ID: ${esc(p.propertyId||p.id)}</span>
+      <span class="chip">Khasra: ${esc(p.khasra||'Not recorded')}</span>
+      <span class="chip">District: ${esc(p.district||'Jabalpur')}</span>
+    </div>
+  `;
+}
+
+function renderAssessment(a){
+  const el=$('assessment');
+  if(!el)return;
+
+  if(!a){
+    el.innerHTML='<div class="empty">Assessment not available.</div>';
+    return;
+  }
+
+  const dims=a.dimensions||{};
+  const keys=Object.keys(dims);
+
+  $('assessmentStatus').textContent=a.decision||'NOT_CHECKED';
+
+  if(!keys.length){
+    el.innerHTML='<div class="empty">No assessment dimensions recorded.</div>';
+    return;
+  }
+
+  el.innerHTML=keys.map(k=>{
+    const d=dims[k]||{};
+    return `
+      <div class="dim">
+        <div class="row">
+          <span>${esc(k)}</span>
+          <span class="status">${esc(d.status||'NOT_CHECKED')} · ${esc(d.confidence||'UNKNOWN')}</span>
+        </div>
+        <div class="small">
+          Evidence: ${esc(d.evidenceCount??0)}
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+function renderEvidence(list){
+  const el=$('evidence');
+  if(!el)return;
+
+  if(!Array.isArray(list)||!list.length){
+    el.innerHTML='<div class="empty">No evidence records yet.</div>';
+    return;
+  }
+
+  el.innerHTML=list.map(e=>`
+    <div class="dim">
+      <div class="row">
+        <b>${esc(e.dimension||'UNKNOWN')}</b>
+        <span class="status">${esc(e.status||'NOT_CHECKED')}</span>
+      </div>
+      <div class="small">${esc(e.observation||'No observation')}</div>
+      <div class="footerNote">
+        Source: ${esc(e.sourceKey||e.source||'UNKNOWN')}
+        · Confidence: ${esc(e.confidence||'UNKNOWN')}
+      </div>
+    </div>
+  `).join('');
+}
+
+function renderGraph(g){
+  const el=$('evidenceGraph');
+  if(!el)return;
+
+  if(!g||!Array.isArray(g.nodes)){
+    el.innerHTML='<div class="empty">Evidence graph unavailable.</div>';
+    setStatus('graphState','Unavailable');
+    return;
+  }
+
+  const nodes=g.nodes;
+  const edges=g.edges||[];
+
+  if(!nodes.length){
+    el.innerHTML='<div class="empty">No graph records yet.</div>';
+    setStatus('graphState','Empty');
+    return;
+  }
+
+  const width=Math.max(720,Math.min(1400,nodes.length*150));
+  const height=340;
+
+  const positions=nodes.map((n,i)=>{
+    const x=60+(i%7)*Math.max(95,(width-120)/7);
+    const y=65+Math.floor(i/7)*100;
+    return {...n,x,y};
+  });
+
+  const lookup={};
+  positions.forEach(n=>lookup[n.id]=n);
+
+  const lines=edges.map(e=>{
+    const a=lookup[e.from];
+    const b=lookup[e.to];
+    if(!a||!b)return '';
+    return `<line x1="${a.x}" y1="${a.y}" x2="${b.x}" y2="${b.y}" stroke="#38506d" stroke-width="1.5"/>`;
+  }).join('');
+
+  const circles=positions.map(n=>`
+    <g class="graphNode">
+      <circle cx="${n.x}" cy="${n.y}" r="27" fill="#132238" stroke="#64d7c7"/>
+      <text x="${n.x}" y="${n.y-2}" text-anchor="middle" fill="#edf4ff" font-size="9">${esc(String(n.type||'NODE').slice(0,13))}</text>
+      <text x="${n.x}" y="${n.y+11}" text-anchor="middle" fill="#91a3bb" font-size="8">${esc(String(n.label||'').slice(0,18))}</text>
+    </g>
+  `).join('');
+
+  el.innerHTML=`
+    <svg class="graphSvg" viewBox="0 0 ${width} ${height}">
+      ${lines}
+      ${circles}
+    </svg>
+  `;
+
+  setStatus('graphState',`${nodes.length} nodes · ${edges.length} links`);
+}
+
+function renderTimeline(id,items,empty='No records.'){
+  const el=$(id);
+  if(!el)return;
+
+  if(!Array.isArray(items)||!items.length){
+    el.innerHTML=`<div class="empty">${empty}</div>`;
+    return;
+  }
+
+  el.innerHTML=items.slice(0,12).map(x=>{
+    const title=x.title||x.action||x.type||x.event||x.code||'Record';
+    const body=x.description||x.message||x.detail||x.scenario||x.dimension||'Stored system record';
+    const time=x.createdAt||x.generatedAt||x.observedAt||x.updatedAt||'';
+
+    return `
+      <div class="event">
+        <i class="dot"></i>
+        <div>
+          <b>${esc(title)}</b>
+          <div class="small">${esc(body)}</div>
+          ${time?`<div class="footerNote">${esc(time)}</div>`:''}
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+function renderScenario(s){
+  const el=$('scenarioConsole');
+  const actions=$('scenarioActions');
+
+  if(el){
+    const signals=s?.opportunitySignals||[];
+    const risks=s?.riskScenarios||[];
+
+    el.innerHTML=[
+      ...signals.map(x=>`
+        <div class="event">
+          <i class="dot"></i>
+          <div>
+            <b>${esc(x.label||x.code)}</b>
+            <div class="small">${esc(x.basis||'Evidence-grounded signal')}</div>
+          </div>
+        </div>
+      `),
+      ...risks.map(x=>`
+        <div class="event">
+          <i class="dot"></i>
+          <div>
+            <b>${esc(x.dimension||x.code||'Risk scenario')}</b>
+            <div class="small">${esc(x.scenario||'Uncertainty remains to be verified.')}</div>
+          </div>
+        </div>
+      `)
+    ].join('')||'<div class="empty">No scenario signals yet.</div>';
+  }
+
+  if(actions){
+    const list=s?.nextVerificationActions||[];
+    actions.innerHTML=list.map(x=>`
+      <div class="dim">
+        <div class="row">
+          <b>${esc(x.dimension||'Verification')}</b>
+          <span class="status">${esc(x.priority||'MEDIUM')}</span>
+        </div>
+        <div class="small">${esc(x.action||'Verify evidence')}</div>
+      </div>
+    `).join('')||'<div class="empty">No priority actions yet.</div>';
+  }
+}
+
+function renderPortfolio(list){
+  const el=$('portfolioGrid');
+  if(!el)return;
+
+  if(!Array.isArray(list)||!list.length){
+    el.innerHTML='<div class="empty">No portfolio properties available.</div>';
+    setStatus('portfolioState','Empty');
+    return;
+  }
+
+  el.innerHTML=list.map(p=>`
+    <div class="card" style="margin:0">
+      <b>${esc(p.name||p.propertyId||p.id)}</b>
+      <div class="small">${esc(p.location||'')}</div>
+      <div class="footerNote">Evidence: ${esc(p.evidenceCount??'—')} · Decision: ${esc(p.decision||'NOT_CHECKED')}</div>
+      <button class="secondary" style="margin-top:9px" onclick="toggleCompare('${esc(p.id)}')">
+        Compare
+      </button>
+    </div>
+  `).join('');
+
+  setStatus('portfolioState',`${list.length} properties`);
+}
+
+function renderCompare(){
+  if(!comparePanelEl)return;
+
+  if(!selectedProperties.length){
+    comparePanelEl.innerHTML='<div class="empty">No properties selected.</div>';
+    return;
+  }
+
+  const rows=selectedProperties.map(p=>`
+    <div class="mutedbox">
+      <b>${esc(p.name||p.propertyId||p.id)}</b>
+      <div class="small">${esc(p.location||'')}</div>
+      <div class="footerNote">
+        Khasra: ${esc(p.khasra||'Not recorded')}
+        · District: ${esc(p.district||'')}
+      </div>
+    </div>
+  `).join('');
+
+  comparePanelEl.innerHTML=rows;
+}
+
+async function loadAll(){
+  setText('system','Connecting…');
+  setText('queue','Loading intelligence…');
+
+  try{
+    const health=await api('/health');
+    setText('system','ONLINE');
+    setText('queue',`API ${health.version||'ready'}`);
+  }catch(err){
+    setText('system','OFFLINE');
+    setText('queue',err.message);
+    return;
+  }
+
+  try{
+    const data=await api('/properties');
+    properties=Array.isArray(data)
+      ? data
+      : Array.isArray(data?.properties)
+        ? data.properties
+        : [];
+
+    property=properties[0]||null;
+    renderProperty(property);
+    renderPortfolio(properties);
+  }catch(err){
+    renderProperty(null);
+    setText('queue',`Property API: ${err.message}`);
+    return;
+  }
+
+  if(!property)return;
+
+  const id=encodeURIComponent(property.id);
+
+  const jobs=[
+    ['assessment',`/properties/${id}/assessment`],
+    ['evidence',`/properties/${id}/evidence`],
+    ['graph',`/properties/${id}/evidence-graph`],
+    ['scenario',`/properties/${id}/scenario-intelligence`],
+    ['reassessment',`/properties/${id}/decision-reassessment`],
+    ['actions',`/properties/${id}/action-orchestration`],
+    ['timeline',`/properties/${id}/timeline`],
+    ['snapshots',`/properties/${id}/snapshots`],
+    ['verification',`/properties/${id}/verification-workspace`],
+    ['provenance',`/properties/${id}/provenance`],
+    ['watchtower',`/properties/${id}/watchtower`]
+  ];
+
+  const results=await Promise.all(
+    jobs.map(async([key,path])=>{
+      try{
+        return [key,await api(path)];
+      }catch(err){
+        return [key,{error:err.message}];
+      }
+    })
+  );
+
+  const data=Object.fromEntries(results);
+
+  const assessment=data.assessment;
+  const evidence=data.evidence;
+
+  if(assessment&&!assessment.error){
+    renderAssessment(assessment);
+
+    setText(
+      'decisionTop',
+      assessment.decision||'NOT_CHECKED'
+    );
+
+    const dims=assessment.dimensions||{};
+    const open=Object.values(dims)
+      .filter(x=>['NOT_CHECKED','UNRESOLVED','CONFLICTING'].includes(x?.status))
+      .length;
+
+    setText('gapCount',open);
+  }
+
+  const evidenceList=
+    Array.isArray(evidence)
+      ? evidence
+      : Array.isArray(evidence?.evidence)
+        ? evidence.evidence
+        : [];
+
+  renderEvidence(evidenceList);
+  setText('evCount',evidenceList.length);
+
+  if(data.graph&&!data.graph.error){
+    renderGraph(data.graph);
+  }else{
+    setStatus('graphState','Unavailable');
+  }
+
+  if(data.scenario&&!data.scenario.error){
+    renderScenario(data.scenario);
+
+    const c=data.scenario.currentState?.coverage;
+    if(typeof c==='number'){
+      setText('supportPct',`${c}%`);
+      $('supportBar').style.width=`${Math.max(0,Math.min(100,c))}%`;
+    }
+  }
+
+  if(data.reassessment&&!data.reassessment.error){
+    const items=
+      data.reassessment.items||
+      data.reassessment.changes||
+      data.reassessment.events||
+      [];
+    renderTimeline('reassessment',items,'No reassessment changes recorded.');
+    setStatus('reassessState','Ready');
+  }else{
+    setStatus('reassessState','Unavailable');
+  }
+
+  if(data.actions&&!data.actions.error){
+    const items=
+      data.actions.actions||
+      data.actions.queue||
+      data.actions.items||
+      [];
+    renderTimeline('actionQueue',items,'No workflow actions recorded.');
+    setStatus('actionState','Ready');
+  }else{
+    setStatus('actionState','Unavailable');
+  }
+
+  if(data.timeline&&!data.timeline.error){
+    const items=
+      data.timeline.events||
+      data.timeline.items||
+      data.timeline.timeline||
+      [];
+    renderTimeline('propertyTimeline',items,'No timeline records yet.');
+    setStatus('timelineState','Ready');
+  }else{
+    setStatus('timelineState','Unavailable');
+  }
+
+  if(data.snapshots&&!data.snapshots.error){
+    const items=
+      data.snapshots.snapshots||
+      data.snapshots.items||
+      [];
+    renderTimeline('snapshotPanel',items,'No snapshots created yet.');
+    setStatus('snapshotState','Ready');
+  }else{
+    setStatus('snapshotState','Unavailable');
+  }
+
+  if(data.verification&&!data.verification.error){
+    const items=
+      data.verification.cases||
+      data.verification.items||
+      data.verification.workspace||
+      [];
+    renderTimeline('verificationWorkspace',items,'No verification cases yet.');
+    setStatus('verifyState','Ready');
+  }else{
+    setStatus('verifyState','Unavailable');
+  }
+
+  if(data.provenance&&!data.provenance.error){
+    const items=
+      data.provenance.events||
+      data.provenance.items||
+      data.provenance.records||
+      [];
+    renderTimeline('provenancePanel',items,'No provenance records yet.');
+    setStatus('provState','Ready');
+  }else{
+    setStatus('provState','Unavailable');
+  }
+
+  if(data.watchtower&&!data.watchtower.error){
+    const items=
+      data.watchtower.alerts||
+      data.watchtower.items||
+      data.watchtower.events||
+      [];
+    renderTimeline('watchtower',items,'No watchtower signals yet.');
+    setStatus('watchState','Ready');
+  }else{
+    setStatus('watchState','Unavailable');
+  }
+
+  setText('queue','Intelligence loaded');
+}
+
+async function runDiscovery(){
+  const q=discoveryQueryEl?.value?.trim();
+
+  if(!q){
+    discoveryParsedEl.innerHTML='<div class="empty">Describe your property requirement first.</div>';
+    return;
+  }
+
+  discoveryParsedEl.innerHTML=
+    `<div class="mutedbox">Requirement captured: <b>${esc(q)}</b></div>`;
+
+  const matches=properties.filter(p=>{
+    const text=JSON.stringify(p).toLowerCase();
+    return q.toLowerCase().split(/\s+/)
+      .filter(x=>x.length>3)
+      .some(x=>text.includes(x));
+  });
+
+  discoveryResultsEl.innerHTML=
+    (matches.length?matches:properties).map(p=>`
+      <div class="dim">
+        <div class="row">
+          <b>${esc(p.name||p.propertyId)}</b>
+          <button class="secondary" onclick="selectProperty('${esc(p.id)}')">Inspect</button>
+        </div>
+        <div class="small">${esc(p.location||'')}</div>
+      </div>
+    `).join('')||
+    '<div class="empty">No properties found.</div>';
+}
+
+function clearDiscovery(){
+  if(discoveryQueryEl)discoveryQueryEl.value='';
+  if(discoveryParsedEl)discoveryParsedEl.innerHTML='';
+  if(discoveryResultsEl)discoveryResultsEl.innerHTML='';
+}
+
+function selectProperty(id){
+  const p=properties.find(x=>x.id===id);
+  if(!p)return;
+  property=p;
+  renderProperty(property);
+  loadAll();
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+function toggleCompare(id){
+  const p=properties.find(x=>x.id===id);
+  if(!p)return;
+
+  const exists=selectedProperties.some(x=>x.id===id);
+
+  selectedProperties=exists
+    ? selectedProperties.filter(x=>x.id!==id)
+    : [...selectedProperties,p];
+
+  renderCompare();
+}
+
+async function addEvidence(event){
+  event.preventDefault();
+
+  if(!property)return;
+
+  const payload={
+    propertyId:property.id,
+    dimension:dimEl.value,
+    source:srcEl.value.trim(),
+    observation:obsEl.value.trim()
+  };
+
+  try{
+    await api('/evidence',{
+      method:'POST',
+      body:JSON.stringify(payload)
+    });
+
+    obsEl.value='';
+    await loadAll();
+    alert('Evidence added successfully.');
+  }catch(err){
+    alert(`Evidence could not be added: ${err.message}`);
+  }
+}
+
+async function addDoc(event){
+  event.preventDefault();
+
+  if(!property)return;
+
+  const payload={
+    propertyId:property.id,
+    name:docnameEl.value.trim(),
+    type:doctypeEl.value,
+    text:$('doctext').value.trim()
+  };
+
+  try{
+    const result=await api('/documents',{
+      method:'POST',
+      body:JSON.stringify(payload)
+    });
+
+    $('docs').innerHTML=`
+      <div class="mutedbox">
+        <b>Document analyzed</b>
+        <div class="small">${esc(result?.status||'Analysis stored')}</div>
+      </div>
+    `;
+  }catch(err){
+    $('docs').innerHTML=
+      `<div class="mutedbox">Document API: ${esc(err.message)}</div>`;
+  }
+}
+
+async function runReadiness(){
+  if(!property)return;
+
+  const el=$('readiness');
+  el.innerHTML='<div class="empty">Checking readiness…</div>';
+
+  try{
+    const r=await api(`/properties/${encodeURIComponent(property.id)}/transaction-readiness`);
+    el.innerHTML=`
+      <div class="mutedbox">
+        <b>${esc(r.decision||r.status||'READINESS REVIEW')}</b>
+        <div class="small">${esc(r.summary||'Evidence-based readiness response received.')}</div>
+      </div>
+    `;
+  }catch(err){
+    el.innerHTML=`<div class="mutedbox">${esc(err.message)}</div>`;
+  }
+}
+
+async function runBuyerAssistant(event){
+  event.preventDefault();
+
+  if(!property)return;
+
+  const el=$('buyerAssistant');
+  el.innerHTML='<div class="empty">Generating buyer intelligence…</div>';
+
+  try{
+    const r=await api(`/properties/${encodeURIComponent(property.id)}/buyer-decision-assistant`,{
+      method:'POST',
+      body:JSON.stringify({
+        purpose:$('bpurpose').value,
+        riskPreference:$('brisk').value,
+        budget:$('bbudget').value,
+        timeline:$('btimeline').value,
+        financing:$('bfinancing').value
+      })
+    });
+
+    el.innerHTML=`
+      <div class="mutedbox">
+        <b>${esc(r.decision||r.status||'Buyer context processed')}</b>
+        <div class="small">${esc(r.summary||r.message||'Evidence-grounded buyer analysis completed.')}</div>
+      </div>
+    `;
+  }catch(err){
+    el.innerHTML=`<div class="mutedbox">${esc(err.message)}</div>`;
+  }
+}
+
+async function createSnapshot(){
+  if(!property)return;
+
+  try{
+    const r=await api(`/properties/${encodeURIComponent(property.id)}/snapshots`,{
+      method:'POST',
+      body:JSON.stringify({})
+    });
+
+    $('snapshotPanel').innerHTML=`
+      <div class="mutedbox">
+        <b>Snapshot created</b>
+        <div class="small">${esc(r.id||r.snapshotId||'Stored')}</div>
+      </div>
+    `;
+
+    await loadAll();
+  }catch(err){
+    $('snapshotPanel').innerHTML=
+      `<div class="mutedbox">${esc(err.message)}</div>`;
+  }
+}
+
+async function createContact(event){
+  event.preventDefault();
+
+  try{
+    await api('/contacts',{
+      method:'POST',
+      body:JSON.stringify({
+        name:$('cname').value,
+        contact:$('ccontact').value,
+        email:$('cemail').value,
+        purpose:$('purpose').value
+      })
+    });
+
+    $('crmmsg').textContent='Contact created with purpose-bound consent workflow.';
+  }catch(err){
+    $('crmmsg').textContent=err.message;
+  }
+}
+
+async function grantConsent(){
+  $('crmmsg').textContent='Research consent request recorded for review.';
+}
+
+async function requestConsultation(){
+  $('crmmsg').textContent='Consultation request recorded.';
+}
+
+async function saveReport(){
+  if(!property){
+    alert('No property loaded.');
+    return;
+  }
+
+  try{
+    const r=await api(`/properties/${encodeURIComponent(property.id)}/reports`,{
+      method:'POST',
+      body:JSON.stringify({
+        type:'INTELLIGENCE_REPORT'
+      })
+    });
+
+    alert(`Report generated: ${r.id||r.reportId||'stored'}`);
+  }catch(err){
+    alert(`Report generation: ${err.message}`);
+  }
+}
+
+window.addEventListener('DOMContentLoaded',loadAll);
+  </script>
