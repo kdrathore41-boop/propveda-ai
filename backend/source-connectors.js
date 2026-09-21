@@ -7,9 +7,24 @@ function buildSampadaCitizenLookup(property={}){const registrationNumber=propert
 function buildReraCitizenLookup(property={}){const project=property.project||property.projectName||'',developer=property.developer||property.promoter||property.promoterName||'',registrationNumber=property.registrationNumber||property.reraNumber||property.reraRegistrationNumber||'',district=property.district||'Jabalpur',tehsil=property.tehsil||'';return{portal:'https://rera.mp.gov.in',searchPath:'/projects-registered/',mode:'PUBLIC_CITIZEN_PROJECT_SEARCH',ready:Boolean(project||developer||registrationNumber||district),lookup:{district,tehsil,projectName:project,promoterName:developer,registrationNumber},filters:['projectType','district','tehsil','projectName'],resultEvidence:['projectName','promoterName','registrationNumber','validity','status','reference'],relatedEvidence:['approvedPlans','uploadedDocuments','complaints','orders'],note:'Official MP RERA public project search can be used by project name, district/tehsil and project type. Capture the opened project record and its official reference; automated API access is not asserted.'};}
 function buildPlanningLookup(property={}){
  const district=String(property.district||'Jabalpur').trim(),key=district.toLowerCase().replace(/\s+/g,'');
- const knownPages={jabalpur:'https://mptownplan.gov.in/plan_jabalpur.html',katni:'https://mptownplan.gov.in/plan_Katni.html',chhindwara:'https://mptownplan.gov.in/plan_Chhindwara.html',singrauli:'https://mptownplan.gov.in/plan_sigrouli.html',singrouli:'https://mptownplan.gov.in/plan_sigrouli.html'};
+ const knownPages={
+  jabalpur:'https://mptownplan.gov.in/plan_jabalpur.html',
+  narsinghpur:'https://mptownplan.gov.in/plan_jabalpur.html',
+  narsimhpur:'https://mptownplan.gov.in/plan_jabalpur.html',
+  sihora:'https://mptownplan.gov.in/plan_jabalpur.html',
+  bhedaghat:'https://mptownplan.gov.in/plan_jabalpur.html',
+  katni:'https://mptownplan.gov.in/plan_Katni.html',
+  chhindwara:'https://mptownplan.gov.in/plan_Chhindwara.html',
+  seoni:'https://mptownplan.gov.in/plan_Chhindwara.html',
+  sausar:'https://mptownplan.gov.in/plan_Chhindwara.html',
+  pandhurna:'https://mptownplan.gov.in/plan_Chhindwara.html',
+  singrauli:'https://mptownplan.gov.in/plan_sigrouli.html',
+  singrouli:'https://mptownplan.gov.in/plan_sigrouli.html',
+  mandla:'https://mptownplan.gov.in/plan_mandla.html',
+  damoh:'https://mptownplan.gov.in/plan_sagar.html'
+ };
  const districtPage=knownPages[key]||'https://mptownplan.gov.in/';
- return{portal:'https://mptownplan.gov.in/',districtPage,mode:'PUBLIC_GIS_AND_DOCUMENT_SEARCH',ready:Boolean(district),lookup:{district,location:property.location||'',khasra:property.khasra||''},availableLayers:['DEVELOPMENT_PLAN','PROPOSED_LAND_USE_MAP','LAND_USE_MAP','DIGITAL_KHASARA_LANDUSE_MAP','GIS_BASED_DEVELOPMENT_PLAN','DEVELOPMENT_PERMISSION'],evidence:['planName','publicationDate','pageOrMapReference','landUseCategory','reference'],note:'Use the Directorate district planning page to identify the applicable development plan, proposed/existing land-use map or Khasra land-use map; ingest the observed document/map reference into Evidence Graph.'};
+ return{portal:'https://mptownplan.gov.in/',districtPage,mode:'PUBLIC_GIS_AND_DOCUMENT_SEARCH',ready:Boolean(district),lookup:{district,location:property.location||'',khasra:property.khasra||''},availableLayers:['DEVELOPMENT_PLAN','PROPOSED_LAND_USE_MAP','LAND_USE_MAP','DIGITAL_KHASARA_LANDUSE_MAP','GIS_BASED_DEVELOPMENT_PLAN','DEVELOPMENT_PERMISSION'],evidence:['planName','publicationDate','pageOrMapReference','landUseCategory','reference'],note:'Use the Directorate planning page for the applicable area, then ingest the observed plan/map reference and land-use category into Evidence Graph.'};
 }
 const CONNECTORS={
  MP_BHULEKH:{mode:'PUBLIC_CITIZEN_SEARCH_OR_AUTHORIZED',execute:({property})=>{const khasraReference=buildBhulekhCopyReference(property,'KHASRA'),khatoniReference=buildBhulekhCopyReference(property,'KHATONI');return{status:AUTHORIZED_ENDPOINTS.MP_BHULEKH?'AUTHORIZED_READY':khasraReference.ready?'PUBLIC_REFERENCE_READY':'CITIZEN_SEARCH_REQUIRED',sourceKey:'MP_BHULEKH',propertyId:property.id,automatedFetch:Boolean(AUTHORIZED_ENDPOINTS.MP_BHULEKH),endpointConfigured:Boolean(AUTHORIZED_ENDPOINTS.MP_BHULEKH),lookup:{district:property.district||'Jabalpur',tehsil:property.tehsil||'',village:property.village||'',khasra:property.khasra||'',location:property.location||'',...bhulekhIds(property)},publicCitizenRoute:{webgis:'https://webgis2.mpbhulekh.gov.in',khasra:khasraReference,khatoni:khatoniReference},requiredEvidence:['recordType','district','tehsil','village','khasra','reference'],message:AUTHORIZED_ENDPOINTS.MP_BHULEKH?'Authorized endpoint configured. Runtime verification is required before production use.':khasraReference.ready?'Verified public Khasra and Khatoni copy routes constructed from official MP Bhulekh identifiers.':'Use the official WebGIS 2.0 citizen search to resolve district, tehsil, village and Khasra identifiers first.'};}},
