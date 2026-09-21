@@ -35,3 +35,5 @@ const required=[
 ['frontend compare UI',front.includes('Compare Properties')&&front.includes('updateCompareSelection()')]
 
 ]; let pass=0; for(const [n,ok] of required){console.log(`${ok?'PASS':'FAIL'}: ${n}`); if(ok)pass++;} console.log(`PropVeda v1.4.1 static smoke test: ${pass}/${required.length} PASS`); if(pass!==required.length)process.exit(1);
+
+// ABPAS runtime evidence ingest verification
