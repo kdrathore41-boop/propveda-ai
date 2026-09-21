@@ -276,10 +276,10 @@ app.get('/api/sources/health', (req,res) => res.json({ generatedAt:new Date().to
 app.get('/api/readiness', (req,res) => res.json({ ...connectorReadiness(), service:'PropVeda AI MVP', version:'1.4.1', sourceRegistry:sourceReadiness(), environment:{ node:process.version, corsConfigured:Boolean(process.env.CORS_ORIGIN), port:Number(PORT) }, runtimeDependencies:{ express:true, cors:true }, productionNote:'Dependency installation and live runtime verification must be completed in the deployment environment.' }));
 app.get('/api/sources/:key', (req,res) => { const s=getSource(req.params.key); if(!s) return res.status(404).json({error:'Source not found'}); res.json(s); });
 app.get('/api/connectors', (req,res) => res.json({ generatedAt:new Date().toISOString(), connectors:connectorStatus() }));
-app.post('/api/properties/:id/source-check/:key', (req,res) => {
+app.post('/api/properties/:id/source-check/:key', async (req,res) => {
   const property=read('properties').find(x=>x.id===req.params.id || x.propertyId===req.params.id);
   if(!property) return res.status(404).json({error:'Property not found'});
-  const result=runConnector(req.params.key, property);
+  const result=await runConnector(req.params.key, property);
   if(!result.ok) return res.status(404).json(result);
   audit('SOURCE_CHECK_REQUESTED', property.id, { sourceKey:result.source.key, status:result.connector.status });
   res.json({ generatedAt:new Date().toISOString(), ...result, principle:'NO EVIDENCE ≠ NEGATIVE EVIDENCE' });
