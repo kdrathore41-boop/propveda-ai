@@ -7,34 +7,85 @@ const AUTHORIZED_ENDPOINTS = {
   MP_TOWN_COUNTRY_PLANNING: process.env.MP_TOWN_COUNTRY_PLANNING_API_URL || ''
 };
 
+function buildBhulekhKhasraReference(property = {}) {
+  const distId = property.dist_id || property.distId || '';
+  const tehId = property.teh_id || property.tehId || '';
+  const lgdCode = property.lgdcode || property.lgdCode || property.villageLgdCode || '';
+  const khasraId = property.khasraId || property.khasra_id || '';
+
+  if (!distId || !tehId || !lgdCode || !khasraId) {
+    return {
+      ready: false,
+      url: 'https://webgis2.mpbhulekh.gov.in',
+      mode: 'CITIZEN_SEARCH',
+      missing: [
+        !distId ? 'dist_id' : null,
+        !tehId ? 'teh_id' : null,
+        !lgdCode ? 'lgdcode' : null,
+        !khasraId ? 'khasraId' : null
+      ].filter(Boolean)
+    };
+  }
+
+  const query = new URLSearchParams({
+    dist_id: String(distId),
+    teh_id: String(tehId),
+    lgdcode: String(lgdCode),
+    khasraId: String(khasraId),
+    lang: String(property.lang || 1)
+  });
+
+  return {
+    ready: true,
+    mode: 'PUBLIC_KHASRA_COPY',
+    url: `https://mpbhulekh.gov.in:8092/UniSearch/getKhasraCopyView?${query.toString()}`,
+    fields: { dist_id: distId, teh_id: tehId, lgdcode: lgdCode, khasraId, lang: property.lang || 1 }
+  };
+}
+
 const CONNECTORS = {
   MP_BHULEKH: {
-    mode: 'MANUAL_OR_AUTHORIZED',
-    execute: ({ property }) => ({
-      status: AUTHORIZED_ENDPOINTS.MP_BHULEKH ? 'AUTHORIZED_READY' : 'MANUAL_REQUIRED',
-      sourceKey: 'MP_BHULEKH',
-      propertyId: property.id,
-      automatedFetch: Boolean(AUTHORIZED_ENDPOINTS.MP_BHULEKH),
-      endpointConfigured: Boolean(AUTHORIZED_ENDPOINTS.MP_BHULEKH),
-      lookup: {
-        district: property.district || 'Jabalpur',
-        tehsil: property.tehsil || '',
-        village: property.village || '',
-        khasra: property.khasra || '',
-        location: property.location || ''
-      },
-      requiredEvidence: [
-        'recordType',
-        'district',
-        'tehsil',
-        'village',
-        'khasra',
-        'reference'
-      ],
-      message: AUTHORIZED_ENDPOINTS.MP_BHULEKH
-        ? 'Authorized endpoint configured. Runtime verification is required before production use.'
-        : 'Authorized access is not configured. Use the official source manually and ingest the observed record as evidence.'
-    })
+    mode: 'PUBLIC_CITIZEN_SEARCH_OR_AUTHORIZED',
+    execute: ({ property }) => {
+      const bhulekhReference = buildBhulekhKhasraReference(property);
+
+      return {
+        status: AUTHORIZED_ENDPOINTS.MP_BHULEKH
+          ? 'AUTHORIZED_READY'
+          : bhulekhReference.ready
+            ? 'PUBLIC_REFERENCE_READY'
+            : 'CITIZEN_SEARCH_REQUIRED',
+        sourceKey: 'MP_BHULEKH',
+        propertyId: property.id,
+        automatedFetch: Boolean(AUTHORIZED_ENDPOINTS.MP_BHULEKH),
+        endpointConfigured: Boolean(AUTHORIZED_ENDPOINTS.MP_BHULEKH),
+        lookup: {
+          district: property.district || 'Jabalpur',
+          tehsil: property.tehsil || '',
+          village: property.village || '',
+          khasra: property.khasra || '',
+          location: property.location || '',
+          dist_id: property.dist_id || property.distId || '',
+          teh_id: property.teh_id || property.tehId || '',
+          lgdcode: property.lgdcode || property.lgdCode || property.villageLgdCode || '',
+          khasraId: property.khasraId || property.khasra_id || ''
+        },
+        publicCitizenRoute: bhulekhReference,
+        requiredEvidence: [
+          'recordType',
+          'district',
+          'tehsil',
+          'village',
+          'khasra',
+          'reference'
+        ],
+        message: AUTHORIZED_ENDPOINTS.MP_BHULEKH
+          ? 'Authorized endpoint configured. Runtime verification is required before production use.'
+          : bhulekhReference.ready
+            ? 'Verified public Khasra-copy route constructed from official MP Bhulekh identifiers.'
+            : 'Use the official WebGIS 2.0 citizen search to resolve district, tehsil, village and Khasra identifiers first.'
+      };
+    }
   },
 
   MP_SAMPADA: {
@@ -125,9 +176,11 @@ function connectorStatus() {
       source: getSource(key)?.name || key,
       automatedFetch: endpointConfigured,
       endpointConfigured,
-      status: endpointConfigured
-        ? 'AUTHORIZED_READY'
-        : 'SCAFFOLD_READY'
+      status: key === 'MP_BHULEKH' && !endpointConfigured
+        ? 'PUBLIC_CITIZEN_ROUTE_AVAILABLE'
+        : endpointConfigured
+          ? 'AUTHORIZED_READY'
+          : 'SCAFFOLD_READY'
     };
   });
 }
@@ -164,9 +217,10 @@ function connectorReadiness() {
     registered: statuses.filter(x => x.registered).length,
     authorizedReady: statuses.filter(x => x.status === 'AUTHORIZED_READY').length,
     automatedFetch: statuses.filter(x => x.automatedFetch).length,
+    publicCitizenRoutes: statuses.filter(x => x.status === 'PUBLIC_CITIZEN_ROUTE_AVAILABLE').length,
     manualFallback: statuses.filter(x => !x.automatedFetch).length,
     productionReady: false,
-    note: 'AUTHORIZED_READY means an endpoint is configured. Runtime verification and authorization validation are still required before production use.',
+    note: 'Public citizen routes are exposed only where the official route is verified. Automated government access still requires authorized runtime integration.',
     connectors: statuses
   };
 }
@@ -174,5 +228,6 @@ function connectorReadiness() {
 module.exports = {
   connectorStatus,
   connectorReadiness,
-  runConnector
+  runConnector,
+  buildBhulekhKhasraReference
 };
