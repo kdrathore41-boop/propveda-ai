@@ -288,6 +288,31 @@ app.post('/api/properties/:id/source-check/:key', async (req,res) => {
 // Normalizes external/manual source observations into the existing Evidence Graph schema.
 app.get('/api/properties/:id/source-check/:key', async (req,res) => {const property=read('properties').find(x=>x.id===req.params.id || x.propertyId===req.params.id);if(!property)return res.status(404).json({error:'Property not found'});const result=await runConnector(req.params.key,property);if(!result.ok)return res.status(404).json(result);audit('SOURCE_CHECK_REQUESTED',property.id,{sourceKey:result.source.key,status:result.connector.status,transport:'GET'});res.json({generatedAt:new Date().toISOString(),...result,principle:'NO EVIDENCE ≠ NEGATIVE EVIDENCE'});});
 
+app.post('/api/properties/:id/source-check/:key/ingest', async (req,res) => {
+  const property=read('properties').find(x=>x.id===req.params.id || x.propertyId===req.params.id);
+  if(!property) return res.status(404).json({error:'Property not found'});
+  const key=String(req.params.key||'').toUpperCase();
+  const result=await runConnector(key,property);
+  if(!result.ok) return res.status(404).json(result);
+  if(key!=='MP_ABPAS' || !result.connector.runtimePublicFetch?.ok) {
+    return res.status(400).json({error:'Runtime evidence ingest is currently enabled for MP_ABPAS public layout fetch only',result});
+  }
+  const runtime=result.connector.runtimePublicFetch;
+  const rows=read('evidence');
+  const added=[];
+  for(const record of (runtime.records||[])){
+    const reference=String(runtime.url||'')+'#'+String(record.sNo||record.layoutName||'');
+    const observation='Published ABPAS layout record: ULB='+String(record.ulb||'')+', Zone='+String(record.zone||'')+', Ward='+String(record.ward||'')+', Colony='+String(record.colonyName||'')+', Layout='+String(record.layoutName||'');
+    const exists=rows.some(x=>x.propertyId===property.id && x.sourceKey===key && x.reference===reference);
+    if(exists) continue;
+    const row={id:id('ev'),propertyId:property.id,dimension:'PLANNING',observation,source:result.source.name,sourceKey:key,reference,observedAt:runtime.observedAt,status:'NOT_CHECKED',confidence:'MEDIUM',verificationMethod:'PUBLIC_HTML_RUNTIME_FETCH',rawEvidenceRef:JSON.stringify(record),notes:'Official public ABPAS layout search observation. Must be reconciled to the exact property/layout before legal or title conclusions.',createdAt:new Date().toISOString()};
+    rows.push(row); added.push(row);
+  }
+  write('evidence',rows);
+  audit('SOURCE_EVIDENCE_INGESTED',property.id,{sourceKey:key,transport:'PUBLIC_HTML_RUNTIME_FETCH',added:added.length,matched:runtime.matched,totalPublishedRows:runtime.totalPublishedRows});
+  res.status(201).json({generatedAt:new Date().toISOString(),sourceKey:key,propertyId:property.id,added:added.length,matched:runtime.matched,totalPublishedRows:runtime.totalPublishedRows,evidence:added,principle:'NO EVIDENCE ≠ NEGATIVE EVIDENCE'});
+});
+
 app.post('/api/properties/:id/evidence/ingest', (req,res) => {
   const p=read('properties').find(x=>x.id===req.params.id); if(!p) return res.status(404).json({error:'Property not found'});
   const b=req.body||{}; const sourceKey=String(b.sourceKey||'').toUpperCase(); const source=getSource(sourceKey);
