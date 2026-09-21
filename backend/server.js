@@ -9,7 +9,7 @@ const ROOT = path.join(__dirname, '..');
 const DATA = path.join(ROOT, 'data');
 const FRONTEND = path.join(ROOT, 'frontend');
 const { listSources, getSource, health: sourceHealth, readiness: sourceReadiness } = require('./source-registry');
-const { connectorStatus, runConnector } = require('./source-connectors');
+const { connectorStatus, connectorReadiness, runConnector } = require('./source-connectors');
 const { decisionIntelligence } = require('./decision-intelligence');
 const { buyerDecisionAssistant } = require('./buyer-decision-assistant');
 const { buildTransactionReadiness } = require('./transaction-readiness');
@@ -273,7 +273,7 @@ function sortDiscovery(rows, sort='relevant') {
 app.get('/api/health', (req, res) => res.json({ ok: true, service: 'PropVeda AI MVP', version: '1.4.1', modules: ['property_identity','evidence_graph','verification','risk_decision','document_intelligence','gis','reports','crm','consent','automation','source_registry','evidence_ingestion','report_versioning','source_connectors','property_intelligence','decision_intelligence','buyer_decision_assistant','transaction_readiness','portfolio_intelligence','scenario_intelligence','evidence_graph_visualizer','evidence_watchtower','decision_reassessment','action_orchestration','property_timeline','evidence_snapshot_engine','evidence_provenance_chain','verification_case_workspace'] }));
 app.get('/api/sources', (req,res) => res.json({ generatedAt:new Date().toISOString(), sources:listSources() }));
 app.get('/api/sources/health', (req,res) => res.json({ generatedAt:new Date().toISOString(), sources:sourceHealth() }));
-app.get('/api/readiness', (req,res) => res.json({ generatedAt:new Date().toISOString(), service:'PropVeda AI MVP', version:'1.4.1', sourceRegistry:sourceReadiness(), connectorRegistry:{total:connectorStatus().length, automatedFetch:0, scaffoldReady:connectorStatus().filter(x=>x.status==='SCAFFOLD_READY').length}, environment:{ node:process.version, corsConfigured:Boolean(process.env.CORS_ORIGIN), port:Number(PORT) }, runtimeDependencies:{ express:true, cors:true }, productionNote:'Dependency installation and live runtime verification must be completed in the deployment environment.' }));
+app.get('/api/readiness', (req,res) => res.json({ ...connectorReadiness(), service:'PropVeda AI MVP', version:'1.4.1', sourceRegistry:sourceReadiness(), environment:{ node:process.version, corsConfigured:Boolean(process.env.CORS_ORIGIN), port:Number(PORT) }, runtimeDependencies:{ express:true, cors:true }, productionNote:'Dependency installation and live runtime verification must be completed in the deployment environment.' }));
 app.get('/api/sources/:key', (req,res) => { const s=getSource(req.params.key); if(!s) return res.status(404).json({error:'Source not found'}); res.json(s); });
 app.get('/api/connectors', (req,res) => res.json({ generatedAt:new Date().toISOString(), connectors:connectorStatus() }));
 app.post('/api/properties/:id/source-check/:key', (req,res) => {
