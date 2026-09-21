@@ -1,3 +1,4 @@
+// CI smoke verification
 const fs=require('fs'); const path=require('path'); const base=__dirname; const read=n=>fs.readFileSync(path.join(base,n),'utf8');
 const server=read('server.js'); const workflow=read('verification-workflow.js'); const front=fs.readFileSync(path.join(base,'..','frontend','index.html'),'utf8');
 const required=[
