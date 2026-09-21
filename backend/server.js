@@ -286,6 +286,8 @@ app.post('/api/properties/:id/source-check/:key', async (req,res) => {
 });
 
 // Normalizes external/manual source observations into the existing Evidence Graph schema.
+app.get('/api/properties/:id/source-check/:key', async (req,res) => {const property=read('properties').find(x=>x.id===req.params.id || x.propertyId===req.params.id);if(!property)return res.status(404).json({error:'Property not found'});const result=await runConnector(req.params.key,property);if(!result.ok)return res.status(404).json(result);audit('SOURCE_CHECK_REQUESTED',property.id,{sourceKey:result.source.key,status:result.connector.status,transport:'GET'});res.json({generatedAt:new Date().toISOString(),...result,principle:'NO EVIDENCE ≠ NEGATIVE EVIDENCE'});});
+
 app.post('/api/properties/:id/evidence/ingest', (req,res) => {
   const p=read('properties').find(x=>x.id===req.params.id); if(!p) return res.status(404).json({error:'Property not found'});
   const b=req.body||{}; const sourceKey=String(b.sourceKey||'').toUpperCase(); const source=getSource(sourceKey);
