@@ -1,37 +1,43 @@
 const SOURCES = [
   {
-    key: 'MP_BHULEKH', name: 'MP Bhulekh', authority: 'Commissioner Land Records, Government of Madhya Pradesh',
-    baseUrl: 'https://mpbhulekh.gov.in', dataTypes: ['LAND_RECORD','KHASRA','KHATAUNI','MAP','REVENUE_COURT'],
-    dimensions: ['TITLE','LEGAL','PLANNING'], accessMethod: 'PUBLIC_CITIZEN_SEARCH_OR_AUTHORIZED_INTEGRATION', freshnessPolicy: 'CHECK_SOURCE_DATE',
-    referenceFields: ['recordType','district','tehsil','village','khasra','reference'], enabled: true, liveApi: false,
-    notes: 'Official land-record portal. Verified citizen Khasra/Khatoni routes are supported; automated API access remains authorization-dependent.'
+    key:'MP_BHULEKH',name:'MP Bhulekh',authority:'Commissioner Land Records, Government of Madhya Pradesh',
+    baseUrl:'https://mpbhulekh.gov.in',dataTypes:['LAND_RECORD','KHASRA','KHATAUNI','MAP','REVENUE_COURT'],
+    dimensions:['TITLE','LEGAL','PLANNING'],accessMethod:'PUBLIC_CITIZEN_SEARCH_OR_AUTHORIZED_INTEGRATION',freshnessPolicy:'CHECK_SOURCE_DATE',
+    referenceFields:['recordType','district','tehsil','village','khasra','reference'],enabled:true,liveApi:false,
+    notes:'Official land-record portal. Verified citizen Khasra/Khatoni routes are supported; automated API access remains authorization-dependent.'
   },
   {
-    key: 'MP_SAMPADA', name: 'SAMPADA / Registration & Stamps', authority: 'Registration & Stamps Department, Government of Madhya Pradesh',
-    baseUrl: 'https://sampada.mpigr.gov.in', dataTypes: ['REGISTERED_DEED','E_REGISTRATION','STAMP','GUIDELINE_VALUE'],
-    dimensions: ['TITLE','FINANCIAL','DOCUMENT'], accessMethod: 'API_SETU_OR_AUTHORIZED_INTEGRATION', freshnessPolicy: 'CHECK_REGISTRATION_DATE',
-    referenceFields: ['registrationNumber','documentType','registrationDate','reference'], enabled: true, liveApi: false,
-    integration: { channel: 'API_SETU', provider: 'Madhya Pradesh State Electronics & Development Corporation (MPSEDC)', contract: 'PROPERTY_DETAILS_API', credentialsRequired: true },
-    notes: 'SAMPADA 2.0 officially documents Open APIs for third parties and a Property Details API. Endpoint/credentials are not publicly exposed, so no endpoint is fabricated.'
+    key:'MP_SAMPADA',name:'SAMPADA / Registration & Stamps',authority:'Registration & Stamps Department, Government of Madhya Pradesh',
+    baseUrl:'https://sampada.mpigr.gov.in',dataTypes:['REGISTERED_DEED','E_REGISTRATION','STAMP','GUIDELINE_VALUE'],
+    dimensions:['TITLE','FINANCIAL','DOCUMENT'],accessMethod:'API_SETU_OR_AUTHORIZED_INTEGRATION',freshnessPolicy:'CHECK_REGISTRATION_DATE',
+    referenceFields:['registrationNumber','documentType','registrationDate','reference'],enabled:true,liveApi:false,
+    integration:{channel:'API_SETU',provider:'Madhya Pradesh State Electronics & Development Corporation (MPSEDC)',contract:'PROPERTY_DETAILS_API',credentialsRequired:true},
+    notes:'SAMPADA 2.0 officially documents Open APIs for third parties and a Property Details API. Endpoint/credentials are not publicly exposed, so no endpoint is fabricated.'
   },
   {
-    key: 'MP_RERA', name: 'Madhya Pradesh RERA', authority: 'Madhya Pradesh Real Estate Regulatory Authority',
-    baseUrl: 'http://rera.mp.gov.in', dataTypes: ['PROJECT','REGISTRATION','COMPLAINT','ORDER'],
-    dimensions: ['PROJECT','LEGAL','DOCUMENT'], accessMethod: 'MANUAL_OR_AUTHORIZED_INTEGRATION', freshnessPolicy: 'CHECK_RECORD_DATE',
-    referenceFields: ['registrationNumber','projectName','reference'], enabled: true, liveApi: false,
-    notes: 'Official authority registry reference; automated access is not asserted.'
+    key:'MP_RERA',name:'Madhya Pradesh RERA',authority:'Madhya Pradesh Real Estate Regulatory Authority',
+    baseUrl:'http://rera.mp.gov.in',dataTypes:['PROJECT','REGISTRATION','COMPLAINT','ORDER'],
+    dimensions:['PROJECT','LEGAL','DOCUMENT'],accessMethod:'MANUAL_OR_AUTHORIZED_INTEGRATION',freshnessPolicy:'CHECK_RECORD_DATE',
+    referenceFields:['registrationNumber','projectName','reference'],enabled:true,liveApi:false,
+    notes:'Official authority registry reference; automated access is not asserted.'
   },
   {
-    key: 'MP_TOWN_COUNTRY_PLANNING', name: 'MP Town & Country Planning', authority: 'Directorate of Town & Country Planning, Madhya Pradesh',
-    baseUrl: 'https://www.mptownplan.gov.in', dataTypes: ['DEVELOPMENT_PLAN','LAND_USE','PLANNING_MAP'],
-    dimensions: ['PLANNING','INFRASTRUCTURE'], accessMethod: 'PUBLIC_WEB_DOCUMENT', freshnessPolicy: 'CHECK_PLAN_DATE',
-    referenceFields: ['planName','publicationDate','page','reference'], enabled: true, liveApi: false,
-    notes: 'Planning documents/maps must be attached as evidence with their publication/reference details.'
+    key:'MP_TOWN_COUNTRY_PLANNING',name:'MP Town & Country Planning',authority:'Directorate of Town & Country Planning, Madhya Pradesh',
+    baseUrl:'https://www.mptownplan.gov.in',dataTypes:['DEVELOPMENT_PLAN','LAND_USE','PLANNING_MAP'],
+    dimensions:['PLANNING','INFRASTRUCTURE'],accessMethod:'PUBLIC_WEB_DOCUMENT',freshnessPolicy:'CHECK_PLAN_DATE',
+    referenceFields:['planName','publicationDate','page','reference'],enabled:true,liveApi:false,
+    notes:'Planning documents/maps must be attached as evidence with their publication/reference details.'
+  },
+  {
+    key:'MP_ABPAS',name:'MP ABPAS 3.0',authority:'Urban Administration & Development Department, Government of Madhya Pradesh',
+    baseUrl:'https://abpas.mpurban.gov.in',dataTypes:['BUILDING_PLAN_APPROVAL','DEVELOPMENT_PERMISSION','COMPLETION_CERTIFICATE','APPLICATION_STATUS'],
+    dimensions:['LEGAL','PLANNING','DOCUMENT'],accessMethod:'PUBLIC_CITIZEN_SEARCH_OR_AUTHORIZED_INTEGRATION',freshnessPolicy:'CHECK_APPLICATION_STATUS_DATE',
+    referenceFields:['applicationNumber','propertyLocation','approvalType','status','reference'],enabled:true,liveApi:false,
+    notes:'Official Automated Building Plan Approval System. Citizen Search and application tracking are publicly exposed; automated API access remains authorization-dependent.'
   }
 ];
-
-function listSources(){ return SOURCES.map(x => ({...x})); }
-function getSource(key){ return SOURCES.find(x => x.key === String(key).toUpperCase()) || null; }
-function health(){ return SOURCES.map(x => ({ key:x.key, enabled:x.enabled, liveApi:x.liveApi, accessMethod:x.accessMethod, status:x.liveApi ? 'READY' : 'SCAFFOLD_MANUAL', baseUrl:x.baseUrl, integration:x.integration || null })); }
-function readiness(){ return { total:SOURCES.length, enabled:SOURCES.filter(x=>x.enabled).length, liveApi:SOURCES.filter(x=>x.liveApi).length, manual:SOURCES.filter(x=>x.enabled && !x.liveApi).length, productionReady:SOURCES.some(x=>x.liveApi), note:'A source is production-ready only when authorized access and runtime verification are implemented.' }; }
-module.exports = { listSources, getSource, health, readiness };
+function listSources(){return SOURCES.map(x=>({...x}));}
+function getSource(key){return SOURCES.find(x=>x.key===String(key).toUpperCase())||null;}
+function health(){return SOURCES.map(x=>({key:x.key,enabled:x.enabled,liveApi:x.liveApi,accessMethod:x.accessMethod,status:x.liveApi?'READY':'SCAFFOLD_MANUAL',baseUrl:x.baseUrl,integration:x.integration||null}));}
+function readiness(){return{total:SOURCES.length,enabled:SOURCES.filter(x=>x.enabled).length,liveApi:SOURCES.filter(x=>x.liveApi).length,manual:SOURCES.filter(x=>x.enabled&&!x.liveApi).length,productionReady:SOURCES.some(x=>x.liveApi),note:'A source is production-ready only when authorized access and runtime verification are implemented.'};}
+module.exports={listSources,getSource,health,readiness};
