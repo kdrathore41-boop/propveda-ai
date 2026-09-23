@@ -36,4 +36,9 @@ const required=[
 
 ]; let pass=0; for(const [n,ok] of required){console.log(`${ok?'PASS':'FAIL'}: ${n}`); if(ok)pass++;} console.log(`PropVeda v1.4.1 static smoke test: ${pass}/${required.length} PASS`); if(pass!==required.length)process.exit(1);
 
+['source registry runtime readiness',read('source-registry.js').includes('runtimePublicFetch')&&read('source-registry.js').includes('RUNTIME_PUBLIC_FETCH_READY')],
+['connector runtime readiness',read('source-connectors.js').includes('runtimePublicFetch')&&read('source-connectors.js').includes('RUNTIME_PUBLIC_FETCH_READY')],
+['ABPAS runtime fetch',read('source-connectors.js').includes('fetchAbpasLayoutRuntime')&&read('source-connectors.js').includes('PUBLIC_HTML_RUNTIME_FETCH')],
+['runtime ingest endpoint',server.includes('/source-check/:key/ingest')&&server.includes('SOURCE_EVIDENCE_INGESTED')],
+
 // ABPAS runtime evidence ingest verification
