@@ -200,9 +200,17 @@ function assessment(propertyId) {
     const rows = byDim[d];
     if (!rows.length) risks[d] = { status: 'NOT_CHECKED', confidence: 'UNKNOWN', evidenceCount: 0 };
     else {
-      const statuses = new Set(rows.map(r => r.status));
+      const statuses = new Set(rows.map(r => r.status || 'NOT_CHECKED'));
       const confidence = rows.some(r => r.confidence === 'HIGH') ? 'HIGH' : rows.some(r => r.confidence === 'MEDIUM') ? 'MEDIUM' : rows.some(r => r.confidence === 'LOW') ? 'LOW' : 'UNKNOWN';
-      risks[d] = { status: statuses.has('CONFLICTING') ? 'CONFLICTING' : statuses.has('UNRESOLVED') ? 'UNRESOLVED' : statuses.has('PARTIALLY_VERIFIED') ? 'PARTIALLY_VERIFIED' : 'VERIFIED', confidence, evidenceCount: rows.length };
+      // Safety gate: evidence presence alone never makes a dimension VERIFIED.
+      // NOT_CHECKED / UNKNOWN evidence must remain unresolved until explicitly verified.
+      const status = statuses.has('CONFLICTING') ? 'CONFLICTING'
+        : statuses.has('UNRESOLVED') ? 'UNRESOLVED'
+        : statuses.has('NOT_CHECKED') ? 'NOT_CHECKED'
+        : statuses.has('PARTIALLY_VERIFIED') ? 'PARTIALLY_VERIFIED'
+        : statuses.size > 0 && [...statuses].every(s => s === 'VERIFIED') ? 'VERIFIED'
+        : 'NOT_CHECKED';
+      risks[d] = { status, confidence, evidenceCount: rows.length };
     }
   }
   const unresolved = Object.values(risks).filter(r => ['NOT_CHECKED','UNRESOLVED','CONFLICTING'].includes(r.status)).length;
