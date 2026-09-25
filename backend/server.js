@@ -232,12 +232,15 @@ function parseBuyerQuery(q='') {
     /\b([a-z][a-z .-]{2,40}?)\s+(?:mein|me)\b/i
   ];
   for(const re of locPatterns){ const m=text.match(re); if(m?.[1]){ const value=m[1].trim().replace(/[.,]+$/,''); if(value && !/^(investment|residential|commercial|property|plot|flat|house)$/i.test(value)){ out.locations=[value]; break; } } }
-  if(/(?:\bplot\b|\bland\b|\bsite\b|प्लॉट|जमीन|भूमि)/iu.test(text)) out.propertyTypes=['PLOT'];
+  if(/(?:\bduplex\b|\btriplex\b|डुप्लेक्स)/iu.test(text)) out.propertyTypes=['DUPLEX'];
+  else if(/(?:\bplot\b|\bland\b|\bsite\b|प्लॉट|जमीन|भूमि)/iu.test(text)) out.propertyTypes=['PLOT'];
   else if(/(?:\bflat\b|\bapartment\b|फ्लैट|अपार्टमेंट)/iu.test(text)) out.propertyTypes=['FLAT'];
-  else if(/(?:\bhouse\b|\bhome\b|\bduplex\b|\btriplex\b|घर)/iu.test(text)) out.propertyTypes=['HOUSE'];
+  else if(/(?:\bhouse\b|\bhome\b|घर)/iu.test(text)) out.propertyTypes=['HOUSE'];
   if(/investment|invest|निवेश/i.test(low)) out.purpose='INVESTMENT';
-  else if(/residen|ghar ke liye|रहने|residential/i.test(low)) out.purpose='RESIDENCE';
+  else if(/self[- ]?use|for living|own use|रहने|स्वयं उपयोग/i.test(low)) out.purpose='SELF_USE';
   else if(/commercial|व्यावसाय/i.test(low)) out.purpose='COMMERCIAL';
+  else if(/farmhouse|farm house|फार्महाउस/i.test(low)) out.purpose='FARMHOUSE';
+  else if(/residen|ghar ke liye|residential/i.test(low)) out.purpose='RESIDENCE';
   const moneyRe=/(?:₹|rs\.?\s*)?([0-9]+(?:\.[0-9]+)?)\s*(crore|cr|करोड़|करod|lakh|lac|लाख|l|k|thousand)(?=\s|$|[.,])/iu;
   const money=text.match(moneyRe);
   if(money){ let v=Number(money[1]); const u=money[2].toLowerCase();
@@ -245,6 +248,10 @@ function parseBuyerQuery(q='') {
     else if(['lakh','lac','लाख','l'].includes(u)) v*=100000;
     else if(['k','thousand'].includes(u)) v*=1000;
     if(/(?:tak|under|below|upto|up to|budget|बजट|तक|के अंदर|से कम|less than)/i.test(text)) out.budgetMax=v;
+  }
+  if(out.budgetMax==null){
+    const numericBudget=text.match(/(?:budget(?:\s+amount)?|maximum budget|max budget|बजट)\s*(?:[:=₹]|rs\.?|amount)?\s*([0-9][0-9,]*)/iu);
+    if(numericBudget) out.budgetMax=Number(numericBudget[1].replace(/,/g,''));
   }
   if(!out.locations.length) out.needsFollowUp.push('LOCATION');
   if(!out.propertyTypes.length) out.needsFollowUp.push('PROPERTY_TYPE');
@@ -255,7 +262,7 @@ function propertyTokens(p){ return arr([p.features,p.amenities,p.tags,p.highligh
 function matchBuyer(b,p) {
   const reasons=[], needs=[]; const price=n(p.price ?? p.askingPrice); const size=n(p.size ?? p.area);
   const loc=String(p.location||'').toLowerCase(); const type=String(p.propertyType||p.type||'').toUpperCase();
-  if(b.budgetMax!=null){ if(price==null) needs.push('BUDGET_CONFIRMATION'); else if(price>b.budgetMax) return null; else reasons.push({factor:'BUDGET',state:'MATCH'}); }
+  if(b.budgetMax!=null){ if(price==null) needs.push('PROPERTY_PRICE_CONFIRMATION'); else if(price>b.budgetMax) return null; else reasons.push({factor:'BUDGET',state:'MATCH'}); }
   if(b.locations?.length){ const hit=b.locations.some(x=>loc.includes(String(x).toLowerCase())); if(!hit) return null; reasons.push({factor:'LOCATION',state:'MATCH'}); }
   if(b.propertyTypes?.length){ if(!type) needs.push('PROPERTY_TYPE_CONFIRMATION'); else if(!b.propertyTypes.includes(type)) return null; else reasons.push({factor:'PROPERTY_TYPE',state:'MATCH'}); }
   if(b.sizeMin!=null||b.sizeMax!=null){ if(size==null) needs.push('SIZE_CONFIRMATION'); else { if(b.sizeMin!=null&&size<b.sizeMin)return null; if(b.sizeMax!=null&&size>b.sizeMax)return null; reasons.push({factor:'SIZE',state:'MATCH'}); } }
