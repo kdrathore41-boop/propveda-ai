@@ -19,6 +19,10 @@ PropVeda AI is an evidence-first **Property Intelligence Platform**. It is desig
 - Buyer activity signals: SEARCH, VIEW, SAVE, COMPARE, ENQUIRY and CONSULTATION. Activity is a signal, not proof of purchase intent.
 - Side-by-side property comparison using recorded facts and evidence coverage; it does not select a winner.
 
+- Public buyer lead capture with explicit callback consent and budget / purpose / location / property type / timeline / site-visit qualification.
+- Token-protected lead inbox for CRM follow-up and lead status tracking.
+- Optional WhatsApp Cloud API template notification to an admin number; requires deployment environment configuration and an approved Meta template.
+
 ## Evidence rules
 - **NO EVIDENCE ≠ NEGATIVE EVIDENCE.**
 - Missing, stale, unresolved or conflicting evidence is surfaced as a verification gap.
