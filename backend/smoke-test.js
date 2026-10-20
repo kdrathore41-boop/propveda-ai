@@ -31,7 +31,7 @@ const required=[
 ['buyer activity routes',server.includes("/api/buyers/:buyerId/activity")&&server.includes('BUYER_ACTIVITY_RECORDED')],
 ['discovery sorting',server.includes('sortDiscovery')&&server.includes("price_asc")&&server.includes("evidence")],
 ['buyerId discovery',server.includes('req.query.buyerId')&&server.includes('Buyer not found')],
-['frontend discovery UI',front.includes('AI Property Discovery')&&front.includes('runDiscovery()')],
+['frontend discovery UI',front.includes('Find My Properties')&&front.includes('runDiscovery()')],
 ['frontend compare UI',front.includes('Compare Properties')&&front.includes('updateCompareSelection()')]
 ,
 ['source registry runtime readiness',read('source-registry.js').includes('runtimePublicFetch')&&read('source-registry.js').includes('RUNTIME_PUBLIC_FETCH_READY')],
