@@ -49,6 +49,12 @@ const required=[
 ,['public intake page and consent checkbox',fs.readFileSync(path.join(base,'..','frontend','buyer-intake.html'),'utf8').includes('name="consent"')&&fs.readFileSync(path.join(base,'..','frontend','buyer-intake.html'),'utf8').includes('/api/public/buyer-leads')]
 ,['admin inbox token is not persisted',fs.readFileSync(path.join(base,'..','frontend','lead-inbox.html'),'utf8').includes("Authorization':'Bearer '+token.value")&&!fs.readFileSync(path.join(base,'..','frontend','lead-inbox.html'),'utf8').includes('localStorage')]
 ,['dashboard links to lead tools',front.includes('/buyer-intake.html')&&front.includes('/lead-inbox.html')]
+
+,['CRM contacts require admin authorization',server.includes("app.get('/api/crm/users', (req,res) => { if(!leadAdminAuthorized(req))")]
+,['buyer profile listing requires admin authorization',server.includes("app.get('/api/buyers', (req,res) => { if(!leadAdminAuthorized(req))")]
+,['buyer activity requires admin authorization',server.includes("app.get('/api/buyers/:buyerId/activity', (req,res) => { if(!leadAdminAuthorized(req))")]
+,['consultation listing requires admin authorization',server.includes("app.get('/api/consultations', (req,res) => { if(!leadAdminAuthorized(req))")]
+,['buyer profile does not duplicate contact PII',!server.includes("buyer.contact=phone; buyer.email=email")]
 ]; let pass=0; for(const [n,ok] of required){console.log(`${ok?'PASS':'FAIL'}: ${n}`); if(ok)pass++;} console.log(`PropVeda v1.4.1 static smoke test: ${pass}/${required.length} PASS`); if(pass!==required.length)process.exit(1);
 
 
