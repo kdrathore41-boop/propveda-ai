@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="hi">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#08111f">
+<title>PropVeda — Buyer Requirement</title>
+<style>
+:root{color-scheme:dark;--bg:#08111f;--panel:#102036;--line:#28415c;--text:#edf4ff;--muted:#9aacc3;--accent:#64d7c7;--blue:#8fa7ff}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(circle at 85% 0,#18365a 0,transparent 34%),var(--bg);color:var(--text);font:15px system-ui,-apple-system,Segoe UI,Roboto,Arial}
+main{width:min(760px,100%);margin:auto;padding:18px 14px 42px}.brand{display:flex;align-items:center;gap:10px;margin:8px 0 24px}.mark{width:42px;height:42px;display:grid;place-items:center;border-radius:13px;background:linear-gradient(135deg,var(--blue),var(--accent));color:#06111d;font-weight:950}.brand small,.muted{color:var(--muted)}.brand small{display:block;font-size:11px;margin-top:2px}
+.card{border:1px solid var(--line);background:rgba(16,32,54,.94);border-radius:18px;padding:20px;box-shadow:0 18px 55px #0003}h1{font-size:25px;margin:6px 0 8px}p{line-height:1.5}.eyebrow{color:var(--accent);font-size:11px;font-weight:800;letter-spacing:.12em;text-transform:uppercase}.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}.full{grid-column:1/-1}label{display:block;font-size:12px;color:var(--muted);margin:8px 0 5px}input,select{width:100%;padding:12px;border:1px solid var(--line);border-radius:10px;background:#0a1728;color:var(--text);font:inherit}fieldset{border:1px solid var(--line);border-radius:12px;margin:0;padding:12px}legend{font-size:12px;color:var(--muted);padding:0 5px}.checks{display:flex;flex-wrap:wrap;gap:8px}.checks label{display:flex;align-items:center;gap:7px;background:#142942;border:1px solid #2b4665;border-radius:9px;padding:9px 10px;margin:0;color:var(--text)}.checks input{width:auto;margin:0;accent-color:var(--accent)}.consent{display:flex;align-items:flex-start;gap:10px;line-height:1.5;font-size:12px;color:#c5d4e7}.consent input{width:auto;margin-top:3px}.btn{width:100%;border:0;border-radius:11px;padding:14px;background:linear-gradient(135deg,var(--accent),#48b8dc);color:#06131e;font-weight:850;font-size:15px;margin-top:16px}.btn:disabled{opacity:.6}.notice{display:none;padding:12px;border-radius:10px;margin-top:14px;line-height:1.5}.notice.ok{display:block;background:#12362f;border:1px solid #28735f}.notice.err{display:block;background:#3b1d2b;border:1px solid #74334a}.tiny{font-size:11px;color:var(--muted);margin-top:15px}.honeypot{position:absolute;left:-9999px;height:1px;width:1px;overflow:hidden}
+@media(max-width:560px){main{padding:12px 10px 28px}.card{padding:15px}h1{font-size:22px}.grid{grid-template-columns:1fr}.full{grid-column:auto}}
+</style></head>
+<body><main>
+<div class="brand"><div class="mark">PV</div><div><b>PropVeda AI</b><small>Real-Estate Intelligence · A product of Amvexa Tech Holdings Private Limited</small></div></div>
+<section class="card">
+<div class="eyebrow">Buyer Intelligence · One Frame · One Input</div>
+<h1>आपको कैसी प्रॉपर्टी चाहिए?</h1>
+<p class="muted">अपना बजट और ज़रूरत बताइए। हमारी टीम जानकारी की पुष्टि करके उपयुक्त विकल्प और साइट विज़िट के बारे में आपसे संपर्क करेगी। यह फॉर्म प्रॉपर्टी की कानूनी जाँच या उपलब्धता की गारंटी नहीं है।</p>
+<form id="leadForm">
+<div class="grid">
+<div><label for="name">आपका नाम *</label><input id="name" name="name" maxlength="80" autocomplete="name" required></div>
+<div><label for="phone">मोबाइल नंबर *</label><input id="phone" name="phone" inputmode="numeric" autocomplete="tel-national" maxlength="14" placeholder="10 अंकों का नंबर" required></div>
+<div class="full"><label for="email">ईमेल (वैकल्पिक)</label><input id="email" name="email" type="email" maxlength="120" autocomplete="email"></div>
+<div><label for="budgetMax">अधिकतम बजट (₹) *</label><input id="budgetMax" name="budgetMax" type="number" min="100000" max="1000000000" step="50000" inputmode="numeric" placeholder="जैसे 3500000" required></div>
+<div><label for="purpose">खरीदने का उद्देश्य *</label><select id="purpose" name="purpose" required><option value="">चुनें</option><option value="SELF_USE">खुद के उपयोग के लिए</option><option value="INVESTMENT">निवेश</option><option value="COMMERCIAL">व्यावसायिक</option><option value="FARMHOUSE">फार्महाउस / वीकेंड</option><option value="GENERAL">अभी विकल्प देख रहा/रही हूँ</option></select></div>
+<div class="full"><label for="location">पसंदीदा लोकेशन / शहर *</label><input id="location" name="location" maxlength="100" placeholder="जैसे Jabalpur, Tilhari, Barela" required></div>
+<div class="full"><fieldset><legend>प्रॉपर्टी का प्रकार चुनें * (एक या अधिक)</legend><div class="checks">
+<label><input type="checkbox" name="propertyTypes" value="PLOT"> प्लॉट</label><label><input type="checkbox" name="propertyTypes" value="HOUSE"> मकान</label><label><input type="checkbox" name="propertyTypes" value="DUPLEX"> डुप्लेक्स</label><label><input type="checkbox" name="propertyTypes" value="FARMLAND"> कृषि / फार्म लैंड</label><label><input type="checkbox" name="propertyTypes" value="FLAT"> फ्लैट</label><label><input type="checkbox" name="propertyTypes" value="COMMERCIAL"> कमर्शियल</label>
+</div></fieldset></div>
+<div><label for="timeline">कब तक खरीदना चाहते हैं? *</label><select id="timeline" name="timeline" required><option value="">चुनें</option><option value="WITHIN_7_DAYS">अगले 7 दिन में</option><option value="WITHIN_30_DAYS">30 दिन में</option><option value="WITHIN_3_MONTHS">3 महीने में</option><option value="RESEARCHING">अभी रिसर्च कर रहा/रही हूँ</option></select></div>
+<div><label for="siteVisit">साइट विज़िट में रुचि? *</label><select id="siteVisit" name="siteVisit" required><option value="">चुनें</option><option value="YES">हाँ, जल्द</option><option value="AFTER_CALL">पहले फोन पर बात करें</option><option value="NOT_YET">अभी नहीं</option></select></div>
+<div class="full"><label for="priorities">सबसे ज़रूरी क्या है? (वैकल्पिक)</label><input id="priorities" name="priorities" maxlength="200" placeholder="जैसे बजट, लोकेशन, दस्तावेज़, रोड कनेक्टिविटी"></div>
+<div class="honeypot" aria-hidden="true"><label for="website">Website</label><input id="website" name="website" tabindex="-1" autocomplete="off"></div>
+<div class="full"><label class="consent"><input id="consent" name="consent" type="checkbox" required><span>मैं सहमति देता/देती हूँ कि PropVeda / Amvexa मेरी इस पूछताछ के संबंध में फोन या ईमेल से संपर्क कर सकते हैं। मेरी जानकारी इस enquiry को संभालने और फॉलो-अप के लिए उपयोग की जाएगी।</span></label></div>
+</div>
+<button class="btn" id="submitBtn" type="submit">मेरी प्रॉपर्टी रिक्वायरमेंट भेजें</button>
+<div id="notice" class="notice" role="status" aria-live="polite"></div>
+</form>
+<div class="tiny">आपकी जानकारी केवल इस enquiry और संबंधित फॉलो-अप के लिए ली जाती है। कृपया OTP, बैंक विवरण या पहचान-पत्र नंबर यहाँ न भेजें।</div>
+</section>
+</main>
+<script>
+const form=document.getElementById('leadForm'),btn=document.getElementById('submitBtn'),notice=document.getElementById('notice');
+form.addEventListener('submit',async e=>{
+ e.preventDefault(); notice.className='notice'; notice.textContent='';
+ const selected=[...form.querySelectorAll('input[name="propertyTypes"]:checked')].map(x=>x.value);
+ if(!selected.length){notice.className='notice err';notice.textContent='कृपया कम-से-कम एक प्रॉपर्टी प्रकार चुनें।';return;}
+ const data={name:document.getElementById('name').value,phone:document.getElementById('phone').value,email:document.getElementById('email').value,budgetMax:document.getElementById('budgetMax').value,purpose:document.getElementById('purpose').value,location:document.getElementById('location').value,propertyTypes:selected,timeline:document.getElementById('timeline').value,siteVisit:document.getElementById('siteVisit').value,priorities:document.getElementById('priorities').value?document.getElementById('priorities').value.split(',').map(x=>x.trim()).filter(Boolean):[],consent:document.getElementById('consent').checked,website:document.getElementById('website').value};
+ btn.disabled=true;btn.textContent='भेजा जा रहा है…';
+ try{
+  const r=await fetch('/api/public/buyer-leads',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(data)});
+  const out=await r.json();if(!r.ok)throw new Error(out.error||'अभी अनुरोध भेजा नहीं जा सका।');
+  notice.className='notice ok';notice.textContent='धन्यवाद! आपकी enquiry सुरक्षित रूप से दर्ज हो गई है। Reference: '+out.leadReference+'. हमारी टीम विवरण की पुष्टि के लिए संपर्क करेगी।';
+  form.reset();
+ }catch(err){notice.className='notice err';notice.textContent=err.message||'नेटवर्क की समस्या है। कृपया दोबारा प्रयास करें।';}
+ finally{btn.disabled=false;btn.textContent='मेरी प्रॉपर्टी रिक्वायरमेंट भेजें';}
+});
+</script></body></html>

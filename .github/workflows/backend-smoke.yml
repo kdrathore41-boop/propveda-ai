@@ -25,5 +25,8 @@ jobs:
       - name: Install backend dependencies
         run: npm install
 
+      - name: Check backend JavaScript syntax
+        run: node --check server.js
+
       - name: Run backend smoke test
         run: npm run smoke
