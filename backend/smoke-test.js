@@ -38,6 +38,17 @@ const required=[
 ['connector runtime readiness',read('source-connectors.js').includes('runtimePublicFetch')&&read('source-connectors.js').includes('RUNTIME_PUBLIC_FETCH_READY')],
 ['ABPAS runtime fetch',read('source-connectors.js').includes('fetchAbpasLayoutRuntime')&&read('source-connectors.js').includes('PUBLIC_HTML_RUNTIME_FETCH')],
 ['runtime ingest endpoint',server.includes('/source-check/:key/ingest')&&server.includes('SOURCE_EVIDENCE_INGESTED')]
+
+,['public buyer intake endpoint',server.includes("app.post('/api/public/buyer-leads'")]
+,['buyer lead validation and consent',server.includes("b.consent!==true")&&server.includes("Please enter a valid 10-digit Indian mobile number")]
+,['buyer lead CRM persistence',server.includes("lead_submissions.json")&&server.includes("QUALIFIED_BUYER_LEAD_RECEIVED")]
+,['token-protected lead inbox',server.includes("app.get('/api/lead-inbox'")&&server.includes("leadAdminAuthorized")]
+,['lead status lifecycle',server.includes("VISIT_SCHEDULED")&&server.includes("CLOSED_WON")&&server.includes("LEAD_STATUS_UPDATED")]
+,['WhatsApp Cloud API template sender',server.includes("notifyLeadOnWhatsApp")&&server.includes("messaging_product:'whatsapp'")&&server.includes("WHATSAPP_TEMPLATE_NAME")]
+,['WhatsApp configuration status endpoint',server.includes("app.get('/api/lead-capture/status'")]
+,['public intake page and consent checkbox',fs.readFileSync(path.join(base,'..','frontend','buyer-intake.html'),'utf8').includes('name="consent"')&&fs.readFileSync(path.join(base,'..','frontend','buyer-intake.html'),'utf8').includes('/api/public/buyer-leads')]
+,['admin inbox token is not persisted',fs.readFileSync(path.join(base,'..','frontend','lead-inbox.html'),'utf8').includes("Authorization':'Bearer '+token.value")&&!fs.readFileSync(path.join(base,'..','frontend','lead-inbox.html'),'utf8').includes('localStorage')]
+,['dashboard links to lead tools',front.includes('/buyer-intake.html')&&front.includes('/lead-inbox.html')]
 ]; let pass=0; for(const [n,ok] of required){console.log(`${ok?'PASS':'FAIL'}: ${n}`); if(ok)pass++;} console.log(`PropVeda v1.4.1 static smoke test: ${pass}/${required.length} PASS`); if(pass!==required.length)process.exit(1);
 
 
