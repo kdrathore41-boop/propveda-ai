@@ -41,7 +41,8 @@ const files = {
   crm_events: path.join(DATA, 'crm_events.json'),
   consents: path.join(DATA, 'consents.json'),
   buyers: path.join(DATA, 'buyers.json'),
-  buyer_activity: path.join(DATA, 'buyer_activity.json')
+  buyer_activity: path.join(DATA, 'buyer_activity.json'),
+  lead_submissions: path.join(DATA, 'lead_submissions.json')
 };
 
 const corsOrigin = process.env.CORS_ORIGIN || '*';
@@ -90,6 +91,7 @@ ensureDataFile('crm_events');
 ensureDataFile('consents');
 ensureDataFile('buyers');
 ensureDataFile('buyer_activity');
+ensureDataFile('lead_submissions');
 
 function detectClauses(text='') {
   return CLAUSE_PATTERNS.filter(x => x.pattern.test(text)).map(x => ({ code:x.code, label:x.label, matched:true, action:x.action }));
@@ -669,6 +671,146 @@ app.get('/api/automation/queue', (req,res) => {
   res.json({generatedAt:new Date().toISOString(),items:[...reports,...consults]});
 });
 app.get('/api/crm/events', (req,res) => res.json(read('crm_events').slice(-200).reverse()));
+
+
+
+// Public buyer lead intake. Contact details are accepted only with explicit callback consent.
+const leadRateBuckets = new Map();
+function leadAdminAuthorized(req) {
+  const expected = String(process.env.LEAD_ADMIN_TOKEN || '');
+  const supplied = String(req.get('authorization') || '').replace(/^Bearer\s+/i, '');
+  return Boolean(expected && supplied && supplied.length === expected.length &&
+    require('crypto').timingSafeEqual(Buffer.from(supplied), Buffer.from(expected)));
+}
+function cleanLeadText(value, max=120) { return String(value || '').trim().replace(/\s+/g, ' ').slice(0, max); }
+function leadQualification(b) {
+  const timeline = String(b.timeline || '').toUpperCase();
+  const visit = String(b.siteVisit || '').toUpperCase();
+  if (['WITHIN_7_DAYS','WITHIN_30_DAYS'].includes(timeline) && visit === 'YES') return 'HOT';
+  if (['WITHIN_7_DAYS','WITHIN_30_DAYS','WITHIN_3_MONTHS'].includes(timeline) || visit === 'AFTER_CALL') return 'WARM';
+  return 'NURTURE';
+}
+async function notifyLeadOnWhatsApp(lead) {
+  const required = ['WHATSAPP_ACCESS_TOKEN','WHATSAPP_PHONE_NUMBER_ID','WHATSAPP_ADMIN_PHONE','WHATSAPP_TEMPLATE_NAME','WHATSAPP_API_VERSION'];
+  if (required.some(k => !String(process.env[k] || '').trim())) return { status:'NOT_CONFIGURED', sentAt:null };
+  const recipient = String(process.env.WHATSAPP_ADMIN_PHONE).replace(/\D/g,'');
+  if (!/^\d{10,15}$/.test(recipient)) return { status:'CONFIG_ERROR', sentAt:null, errorCode:'INVALID_ADMIN_PHONE' };
+  const url = 'https://graph.facebook.com/' + process.env.WHATSAPP_API_VERSION + '/' + process.env.WHATSAPP_PHONE_NUMBER_ID + '/messages';
+  const params = [
+    lead.name, lead.phone, 'INR ' + Number(lead.budgetMax).toLocaleString('en-IN'),
+    lead.purpose, lead.location, lead.timeline, lead.siteVisit
+  ].map(value => ({ type:'text', text:String(value || '-').slice(0,250) }));
+  try {
+    const response = await fetch(url, {
+      method:'POST',
+      headers:{ 'Authorization':'Bearer ' + process.env.WHATSAPP_ACCESS_TOKEN, 'Content-Type':'application/json' },
+      body:JSON.stringify({
+        messaging_product:'whatsapp', to:recipient, type:'template',
+        template:{ name:process.env.WHATSAPP_TEMPLATE_NAME, language:{ code:process.env.WHATSAPP_TEMPLATE_LANGUAGE || 'en_US' }, components:[{type:'body',parameters:params}] }
+      }),
+      signal:AbortSignal.timeout(8000)
+    });
+    const payload = await response.json().catch(() => ({}));
+    if (!response.ok) return { status:'FAILED', sentAt:null, errorCode:String(payload?.error?.code || response.status).slice(0,40) };
+    return { status:'SENT', sentAt:new Date().toISOString(), messageId:payload?.messages?.[0]?.id || null };
+  } catch (error) {
+    return { status:'FAILED', sentAt:null, errorCode:error?.name === 'TimeoutError' ? 'TIMEOUT' : 'NETWORK_ERROR' };
+  }
+}
+app.get('/api/lead-capture/status', (req,res) => res.json({
+  publicIntake:true,
+  crmStorage:'JSON_MVP',
+  whatsappNotifications:['WHATSAPP_ACCESS_TOKEN','WHATSAPP_PHONE_NUMBER_ID','WHATSAPP_ADMIN_PHONE','WHATSAPP_TEMPLATE_NAME','WHATSAPP_API_VERSION'].every(k=>Boolean(String(process.env[k]||'').trim()))?'CONFIGURED':'NOT_CONFIGURED',
+  protectedInbox:Boolean(process.env.LEAD_ADMIN_TOKEN),
+  note:'WhatsApp delivery requires a valid Meta WhatsApp Cloud API setup and an approved template with seven body parameters.'
+}));
+app.post('/api/public/buyer-leads', async (req,res) => {
+  const b=req.body||{};
+  // Honeypot field for simple bot filtering.
+  if (String(b.website||'').trim()) return res.status(202).json({accepted:true,message:'Thank you. Your request has been received.'});
+  const ip=String(req.headers['x-forwarded-for']||req.socket.remoteAddress||'unknown').split(',')[0].trim();
+  const now=Date.now(), prior=(leadRateBuckets.get(ip)||[]).filter(t=>now-t<60*60*1000);
+  if(prior.length>=8) return res.status(429).json({error:'Too many submissions. Please try again later.'});
+  prior.push(now); leadRateBuckets.set(ip,prior);
+  const name=cleanLeadText(b.name,80);
+  const digits=String(b.phone||'').replace(/\D/g,'');
+  const phone=digits.length===12&&digits.startsWith('91')?digits.slice(2):digits;
+  const email=cleanLeadText(b.email,120);
+  const budgetMax=Number(String(b.budgetMax||'').replace(/[, ]/g,''));
+  const purpose=String(b.purpose||'').toUpperCase();
+  const propertyTypes=Array.isArray(b.propertyTypes)?b.propertyTypes.map(x=>String(x).toUpperCase()).filter(x=>['PLOT','HOUSE','DUPLEX','FARMLAND','FLAT','COMMERCIAL'].includes(x)).slice(0,4):[];
+  const location=cleanLeadText(b.location,100);
+  const timeline=String(b.timeline||'').toUpperCase();
+  const siteVisit=String(b.siteVisit||'').toUpperCase();
+  if(name.length<2) return res.status(400).json({error:'Please enter your name.'});
+  if(!/^\d{10}$/.test(phone)) return res.status(400).json({error:'Please enter a valid 10-digit Indian mobile number.'});
+  if(email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return res.status(400).json({error:'Please enter a valid email address or leave it blank.'});
+  if(!Number.isFinite(budgetMax)||budgetMax<100000||budgetMax>1000000000) return res.status(400).json({error:'Please enter a realistic maximum budget in rupees.'});
+  if(!['SELF_USE','INVESTMENT','COMMERCIAL','FARMHOUSE','GENERAL'].includes(purpose)) return res.status(400).json({error:'Please select your purchase purpose.'});
+  if(!location) return res.status(400).json({error:'Please enter a preferred location.'});
+  if(!propertyTypes.length) return res.status(400).json({error:'Please select at least one property type.'});
+  if(!['WITHIN_7_DAYS','WITHIN_30_DAYS','WITHIN_3_MONTHS','RESEARCHING'].includes(timeline)) return res.status(400).json({error:'Please select your buying timeline.'});
+  if(!['YES','AFTER_CALL','NOT_YET'].includes(siteVisit)) return res.status(400).json({error:'Please select your site-visit preference.'});
+  if(b.consent!==true) return res.status(400).json({error:'Consent is required so the PropVeda team can contact you about this enquiry.'});
+  const createdAt=new Date().toISOString();
+  const leadId=id('lead');
+  const qualification=leadQualification({timeline,siteVisit});
+  const buyer=buyerProfile({
+    name,budgetMax,locations:[location],propertyTypes,purpose,
+    sizeMin:b.sizeMin||null,sizeMax:b.sizeMax||null,timeline,
+    priorities:Array.isArray(b.priorities)?b.priorities.map(x=>cleanLeadText(x,40)).slice(0,8):[]
+  });
+  const users=read('users');
+  let user=users.find(x=>String(x.contact||'').replace(/\D/g,'').slice(-10)===phone);
+  if(user) {
+    user.name=name; user.email=email||user.email||''; user.purpose=purpose; user.budget=budgetMax;
+    user.areas=[location]; user.updatedAt=createdAt;
+  } else {
+    user={id:id('usr'),name,contact:phone,email,purpose,budget:budgetMax,areas:[location],riskPreference:'UNKNOWN',createdAt,updatedAt:createdAt};
+    users.push(user);
+  }
+  write('users',users);
+  buyer.contact=phone; buyer.email=email; buyer.crmUserId=user.id; buyer.source='PUBLIC_BUYER_INTAKE';
+  const buyers=read('buyers'); buyers.push(buyer); write('buyers',buyers.slice(-500));
+  const consent={id:id('consent'),userId:user.id,purpose:'PROPERTY_MATCHING_AND_CALLBACK',granted:true,channel:'PUBLIC_WEB_FORM',policyVersion:'1.0',grantedAt:createdAt,withdrawnAt:null};
+  const consents=read('consents'); consents.push(consent); write('consents',consents);
+  const lead={
+    leadId,crmUserId:user.id,buyerId:buyer.buyerId,name,phone,email,
+    budgetMax,purpose,location,propertyTypes,timeline,siteVisit,
+    priorities:buyer.priorities,consentId:consent.id,consentGrantedAt:createdAt,
+    qualification,qualificationNote:qualification==='HOT'?'Near-term timeline and site-visit intent reported by buyer; verify by phone.':qualification==='WARM'?'Some buying intent reported; confirm budget and visit readiness by phone.':'Early-stage enquiry; nurture before scheduling a visit.',
+    source:'PROPVEDA_PUBLIC_FORM',status:'NEW',createdAt,updatedAt:createdAt,
+    whatsappNotification:{status:'PENDING',sentAt:null}
+  };
+  const leads=read('lead_submissions'); leads.push(lead); write('lead_submissions',leads.slice(-2000));
+  crmEvent('QUALIFIED_BUYER_LEAD_RECEIVED',leadId,{crmUserId:user.id,buyerId:buyer.buyerId,qualification,source:lead.source});
+  audit('PUBLIC_BUYER_LEAD_RECEIVED',leadId,{crmUserId:user.id,buyerId:buyer.buyerId,qualification,consentId:consent.id});
+  const notification=await notifyLeadOnWhatsApp(lead);
+  lead.whatsappNotification=notification; lead.updatedAt=new Date().toISOString();
+  const saved=read('lead_submissions'); const index=saved.findIndex(x=>x.leadId===leadId);
+  if(index>=0){saved[index]=lead;write('lead_submissions',saved);}
+  crmEvent('LEAD_WHATSAPP_NOTIFICATION_'+notification.status,leadId,{qualification,errorCode:notification.errorCode||null});
+  res.status(201).json({
+    accepted:true,leadReference:leadId,qualification,
+    message:'Thank you. Your enquiry is saved. Our team will contact you to confirm the details.',
+    notificationStatus:notification.status==='SENT'?'SENT':notification.status==='FAILED'?'RETRY_REQUIRED':'PENDING_CONFIGURATION'
+  });
+});
+app.get('/api/lead-inbox', (req,res) => {
+  if(!leadAdminAuthorized(req)) return res.status(process.env.LEAD_ADMIN_TOKEN?401:503).json({error:process.env.LEAD_ADMIN_TOKEN?'Admin authorization required.':'Lead inbox is disabled until LEAD_ADMIN_TOKEN is configured.'});
+  const leads=read('lead_submissions').slice().sort((a,b)=>String(b.createdAt).localeCompare(String(a.createdAt)));
+  res.json({count:leads.length,leads});
+});
+app.patch('/api/lead-inbox/:leadId', (req,res) => {
+  if(!leadAdminAuthorized(req)) return res.status(process.env.LEAD_ADMIN_TOKEN?401:503).json({error:process.env.LEAD_ADMIN_TOKEN?'Admin authorization required.':'Lead inbox is disabled until LEAD_ADMIN_TOKEN is configured.'});
+  const status=String(req.body?.status||'').toUpperCase();
+  if(!['NEW','CONTACTED','QUALIFIED','VISIT_SCHEDULED','CLOSED_WON','CLOSED_LOST','NURTURE'].includes(status)) return res.status(400).json({error:'Invalid lead status.'});
+  const rows=read('lead_submissions'); const lead=rows.find(x=>x.leadId===req.params.leadId);
+  if(!lead) return res.status(404).json({error:'Lead not found.'});
+  lead.status=status; lead.updatedAt=new Date().toISOString(); write('lead_submissions',rows);
+  crmEvent('LEAD_STATUS_UPDATED',lead.leadId,{status}); audit('LEAD_STATUS_UPDATED',lead.leadId,{status});
+  res.json({leadId:lead.leadId,status:lead.status,updatedAt:lead.updatedAt});
+});
 
 
 app.use((err, req, res, next) => { console.error(err); res.status(500).json({ error: 'Internal server error' }); });
