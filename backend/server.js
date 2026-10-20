@@ -481,13 +481,13 @@ app.get('/api/properties/:id/snapshots/compare', (req,res) => {
 app.get('/api/properties/:id/snapshots/:snapshotId', (req,res) => { const row=read('snapshots').find(x=>x.propertyId===req.params.id&&x.snapshotId===req.params.snapshotId); if(!row)return res.status(404).json({error:'Snapshot not found'}); res.json(row); });
 
 
-app.get('/api/buyers', (req,res) => res.json(read('buyers')));
+app.get('/api/buyers', (req,res) => { if(!leadAdminAuthorized(req)) return res.status(process.env.LEAD_ADMIN_TOKEN?401:503).json({error:process.env.LEAD_ADMIN_TOKEN?'Admin authorization required.':'Lead data is disabled until LEAD_ADMIN_TOKEN is configured.'}); res.json(read('buyers')); });
 app.post('/api/buyers', (req,res) => { const row=buyerProfile(req.body||{}); const rows=read('buyers'); rows.push(row); write('buyers',rows.slice(-500)); audit('BUYER_PROFILE_CREATED',row.buyerId,{purpose:row.purpose}); res.status(201).json(row); });
-app.get('/api/buyers/:buyerId', (req,res) => { const row=read('buyers').find(x=>x.buyerId===req.params.buyerId); if(!row)return res.status(404).json({error:'Buyer not found'}); res.json(row); });
+app.get('/api/buyers/:buyerId', (req,res) => { if(!leadAdminAuthorized(req)) return res.status(process.env.LEAD_ADMIN_TOKEN?401:503).json({error:process.env.LEAD_ADMIN_TOKEN?'Admin authorization required.':'Buyer data is disabled until LEAD_ADMIN_TOKEN is configured.'}); const row=read('buyers').find(x=>x.buyerId===req.params.buyerId); if(!row)return res.status(404).json({error:'Buyer not found'}); res.json(row); });
 app.patch('/api/buyers/:buyerId', (req,res) => { const rows=read('buyers'); const row=rows.find(x=>x.buyerId===req.params.buyerId); if(!row)return res.status(404).json({error:'Buyer not found'}); Object.assign(row,buyerProfile({...row,...req.body}),{buyerId:row.buyerId,createdAt:row.createdAt,updatedAt:new Date().toISOString()}); write('buyers',rows); audit('BUYER_PROFILE_UPDATED',row.buyerId); res.json(row); });
 app.post('/api/buyers/query', (req,res) => { const parsed=parseBuyerQuery(req.body?.query||''); res.json({parsed,principle:'Parsed requirements are suggestions and require user confirmation before hard filtering.'}); });
 app.post('/api/buyers/:buyerId/activity', (req,res) => { const allowed=new Set(['SEARCH','VIEW','SAVE','COMPARE','ENQUIRY','CONSULTATION']); const type=String(req.body?.type||'').toUpperCase(); if(!allowed.has(type)) return res.status(400).json({error:'Invalid activity type',allowed:[...allowed]}); const buyer=read('buyers').find(x=>x.buyerId===req.params.buyerId); if(!buyer)return res.status(404).json({error:'Buyer not found'}); const row={activityId:id('activity'),buyerId:buyer.buyerId,type,propertyId:req.body?.propertyId||null,metadata:req.body?.metadata||{},createdAt:new Date().toISOString(),principle:'Activity is a signal, not proof of purchase intent.'}; const rows=read('buyer_activity'); rows.push(row); write('buyer_activity',rows.slice(-5000)); audit('BUYER_ACTIVITY_RECORDED',buyer.buyerId,{type,propertyId:row.propertyId}); res.status(201).json(row); });
-app.get('/api/buyers/:buyerId/activity', (req,res) => { const buyer=read('buyers').find(x=>x.buyerId===req.params.buyerId); if(!buyer)return res.status(404).json({error:'Buyer not found'}); res.json(read('buyer_activity').filter(x=>x.buyerId===buyer.buyerId).slice(-200)); });
+app.get('/api/buyers/:buyerId/activity', (req,res) => { if(!leadAdminAuthorized(req)) return res.status(process.env.LEAD_ADMIN_TOKEN?401:503).json({error:process.env.LEAD_ADMIN_TOKEN?'Admin authorization required.':'Buyer activity is disabled until LEAD_ADMIN_TOKEN is configured.'}); const buyer=read('buyers').find(x=>x.buyerId===req.params.buyerId); if(!buyer)return res.status(404).json({error:'Buyer not found'}); res.json(read('buyer_activity').filter(x=>x.buyerId===buyer.buyerId).slice(-200)); });
 app.get('/api/buyers/:buyerId/matches', (req,res) => { const b=read('buyers').find(x=>x.buyerId===req.params.buyerId); if(!b)return res.status(404).json({error:'Buyer not found'}); const matches=read('properties').map(p=>{const m=matchBuyer(b,p); return m?{...m,property:p}:null}).filter(Boolean); res.json({buyerId:b.buyerId,count:matches.length,matches,noResultInsight:matches.length?null:'No property currently satisfies the available hard requirements. You can broaden location, budget, size or type.'}); });
 app.get('/api/discovery', (req,res) => { const parsed=req.query.q?parseBuyerQuery(req.query.q):{}; const b=req.query.buyerId ? read('buyers').find(x=>x.buyerId===req.query.buyerId) : buyerProfile({budgetMax:req.query.maxBudget||parsed.budgetMax,locations:req.query.location?[req.query.location]:parsed.locations,propertyTypes:req.query.type?[String(req.query.type).toUpperCase()]:parsed.propertyTypes,sizeMin:req.query.minSize||parsed.sizeMin,sizeMax:req.query.maxSize||parsed.sizeMax,purpose:req.query.purpose||parsed.purpose||'GENERAL'}); if(!b)return res.status(404).json({error:'Buyer not found'}); const raw=read('properties').map(p=>{const m=matchBuyer(b,p); return m?{...m,property:p}:null}).filter(Boolean); const requestedSort=String(req.query.sort||'relevant').toLowerCase(); const allowedSorts=new Set(['relevant','price_asc','size','updated','evidence']); const sort=allowedSorts.has(requestedSort)?requestedSort:'relevant'; const results=sortDiscovery(raw,sort); if(req.query.buyerId)audit('BUYER_SEARCH',req.query.buyerId,{sort:req.query.sort||'relevant',resultCount:results.length}); res.json({query:req.query.q||'',buyerId:req.query.buyerId||null,parsed,sort,results,noResultInsight:results.length?null:'No adequate matching inventory found with the current requirements. Consider changing only the requirement you choose to relax.'}); });
 app.post('/api/matching/explain', (req,res) => { const b=buyerProfile(req.body?.buyer||{}); const ids=arr(req.body?.propertyIds); const rows=read('properties').filter(p=>ids.includes(p.id)||ids.includes(p.propertyId)); res.json({buyer:b,explanations:rows.map(p=>({propertyId:p.propertyId||p.id,explanation:matchBuyer(b,p)||{fit:'LOW_FIT',reasons:[],needsConfirmation:['HARD_FILTER']}}))}); });
@@ -617,7 +617,7 @@ function crmEvent(type, entityId, payload = {}) {
   write('crm_events', rows.slice(-1000));
 }
 
-app.get('/api/crm/users', (req,res) => res.json(read('users')));
+app.get('/api/crm/users', (req,res) => { if(!leadAdminAuthorized(req)) return res.status(process.env.LEAD_ADMIN_TOKEN?401:503).json({error:process.env.LEAD_ADMIN_TOKEN?'Admin authorization required.':'CRM contacts are disabled until LEAD_ADMIN_TOKEN is configured.'}); res.json(read('users')); });
 app.post('/api/crm/users', (req,res) => {
   const b=req.body||{};
   if(!b.name || !b.contact) return res.status(400).json({error:'name and contact are required'});
@@ -664,13 +664,13 @@ app.post('/api/consultations', (req,res) => {
   const row={id:id('consult'),userId:b.userId,propertyId:b.propertyId,mode:b.mode||'CALLBACK',message:b.message||'',status:'REQUESTED',createdAt:new Date().toISOString()};
   const rows=read('consultations'); rows.push(row); write('consultations',rows); crmEvent('CONSULTATION_REQUESTED',row.id,{userId:row.userId,propertyId:row.propertyId}); audit('CONSULTATION_REQUESTED',row.id,{userId:row.userId,propertyId:row.propertyId}); res.status(201).json(row);
 });
-app.get('/api/consultations', (req,res) => res.json(read('consultations')));
+app.get('/api/consultations', (req,res) => { if(!leadAdminAuthorized(req)) return res.status(process.env.LEAD_ADMIN_TOKEN?401:503).json({error:process.env.LEAD_ADMIN_TOKEN?'Admin authorization required.':'Consultation data is disabled until LEAD_ADMIN_TOKEN is configured.'}); res.json(read('consultations')); });
 app.get('/api/automation/queue', (req,res) => {
   const reports=read('reports').filter(x=>x.status==='GENERATED').map(x=>({type:'REPORT_READY',id:x.reportId,propertyId:x.property.id,channel:x.delivery}));
   const consults=read('consultations').filter(x=>x.status==='REQUESTED').map(x=>({type:'CONSULTATION_FOLLOW_UP',id:x.id,propertyId:x.propertyId,userId:x.userId}));
   res.json({generatedAt:new Date().toISOString(),items:[...reports,...consults]});
 });
-app.get('/api/crm/events', (req,res) => res.json(read('crm_events').slice(-200).reverse()));
+app.get('/api/crm/events', (req,res) => { if(!leadAdminAuthorized(req)) return res.status(process.env.LEAD_ADMIN_TOKEN?401:503).json({error:process.env.LEAD_ADMIN_TOKEN?'Admin authorization required.':'CRM events are disabled until LEAD_ADMIN_TOKEN is configured.'}); res.json(read('crm_events').slice(-200).reverse()); });
 
 
 
@@ -770,7 +770,7 @@ app.post('/api/public/buyer-leads', async (req,res) => {
     users.push(user);
   }
   write('users',users);
-  buyer.contact=phone; buyer.email=email; buyer.crmUserId=user.id; buyer.source='PUBLIC_BUYER_INTAKE';
+  buyer.source='PUBLIC_BUYER_INTAKE';
   const buyers=read('buyers'); buyers.push(buyer); write('buyers',buyers.slice(-500));
   const consent={id:id('consent'),userId:user.id,purpose:'PROPERTY_MATCHING_AND_CALLBACK',granted:true,channel:'PUBLIC_WEB_FORM',policyVersion:'1.0',grantedAt:createdAt,withdrawnAt:null};
   const consents=read('consents'); consents.push(consent); write('consents',consents);
