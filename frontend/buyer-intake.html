@@ -45,7 +45,7 @@ form.addEventListener('submit',async e=>{
  e.preventDefault(); notice.className='notice'; notice.textContent='';
  const selected=[...form.querySelectorAll('input[name="propertyTypes"]:checked')].map(x=>x.value);
  if(!selected.length){notice.className='notice err';notice.textContent='कृपया कम-से-कम एक प्रॉपर्टी प्रकार चुनें।';return;}
- const data={name:form.name.value,phone:form.phone.value,email:form.email.value,budgetMax:form.budgetMax.value,purpose:form.purpose.value,location:form.location.value,propertyTypes:selected,timeline:form.timeline.value,siteVisit:form.siteVisit.value,priorities:form.priorities.value?form.priorities.value.split(',').map(x=>x.trim()).filter(Boolean):[],consent:form.consent.checked,website:form.website.value};
+ const data={name:document.getElementById('name').value,phone:document.getElementById('phone').value,email:document.getElementById('email').value,budgetMax:document.getElementById('budgetMax').value,purpose:document.getElementById('purpose').value,location:document.getElementById('location').value,propertyTypes:selected,timeline:document.getElementById('timeline').value,siteVisit:document.getElementById('siteVisit').value,priorities:document.getElementById('priorities').value?document.getElementById('priorities').value.split(',').map(x=>x.trim()).filter(Boolean):[],consent:document.getElementById('consent').checked,website:document.getElementById('website').value};
  btn.disabled=true;btn.textContent='भेजा जा रहा है…';
  try{
   const r=await fetch('/api/public/buyer-leads',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(data)});
