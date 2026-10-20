@@ -35,3 +35,14 @@ The JSON data layer is suitable for an MVP/demo workflow, not concurrent product
 
 ## Current verification note
 Static source checks: **30/30 PASS**. Live runtime was not verified in the packaging environment because dependency installation timed out. After deployment, confirm `/api/health`, `/api/readiness`, the frontend, buyer discovery, and a sample property intelligence route from the deployed service.
+
+## Public buyer lead intake and notifications
+- Public form: /buyer-intake.html
+- Admin inbox: /lead-inbox.html
+- POST /api/public/buyer-leads validates contact and buying requirements, requires explicit callback consent, stores the CRM contact + buyer profile + lead, and records a CRM/audit event.
+- GET /api/lead-inbox and PATCH /api/lead-inbox/:leadId require Authorization: Bearer <LEAD_ADMIN_TOKEN>. Set LEAD_ADMIN_TOKEN in Render before using the inbox. Do not put this token in frontend source or send it to buyers.
+- GET /api/lead-capture/status reports whether WhatsApp and the protected inbox are configured without revealing credentials.
+- WhatsApp Cloud API delivery requires WHATSAPP_ACCESS_TOKEN, WHATSAPP_PHONE_NUMBER_ID, WHATSAPP_ADMIN_PHONE, WHATSAPP_API_VERSION, WHATSAPP_TEMPLATE_NAME, and optionally WHATSAPP_TEMPLATE_LANGUAGE. Configure the currently supported Graph API version in Meta.
+- Create/approve a WhatsApp message template whose body has seven text placeholders, in this order: buyer name, mobile, max budget, purpose, location, buying timeline, site-visit preference. The server sends a template message to the configured admin recipient. Never commit access tokens to GitHub.
+- If WhatsApp variables are missing, the lead is still saved in the CRM inbox and its notification state remains NOT_CONFIGURED; if Meta rejects or times out, the lead is saved and notification state is marked for retry. Do not treat a saved lead as proof the WhatsApp message was delivered.
+- The public form includes consent, basic validation, a honeypot and an in-memory rate limit. JSON-file storage is an MVP limitation: use a persistent disk/transactional database and stronger production controls before large-scale advertising. No automatic message is sent to the buyer.
