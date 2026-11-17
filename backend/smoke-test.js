@@ -62,4 +62,17 @@ const required=[
 ]; let pass=0; for(const [n,ok] of required){console.log(`${ok?'PASS':'FAIL'}: ${n}`); if(ok)pass++;} console.log(`PropVeda v1.4.1 static smoke test: ${pass}/${required.length} PASS`); if(pass!==required.length)process.exit(1);
 
 
+// LGD manual lookup behavior verification
+const {buildLgdDirectoryLookup,connectorStatus}=require('./source-connectors');
+const lgdLookup=buildLgdDirectoryLookup({district:'Jabalpur',tehsil:'Shahpura'});
+const lgdConnector=connectorStatus().find(x=>x.key==='MP_LGD_DIRECTORY');
+const lgdChecks=[
+ ['LGD lookup builder output',lgdLookup.ready&&lgdLookup.lookup.district==='Jabalpur'&&lgdLookup.lookup.tehsil==='Shahpura'],
+ ['LGD connector appears in connector status',Boolean(lgdConnector)],
+ ['LGD connector is manual, not automated',lgdConnector?.status==='PUBLIC_MANUAL_LOOKUP_AVAILABLE'&&!lgdConnector?.automatedFetch]
+];
+let lgdPass=0;for(const [n,ok] of lgdChecks){console.log(`${ok?'PASS':'FAIL'}: ${n}`);if(ok)lgdPass++;}
+console.log(`LGD manual lookup behavior: ${lgdPass}/${lgdChecks.length} PASS`);
+if(lgdPass!==lgdChecks.length)process.exit(1);
+
 // ABPAS runtime evidence ingest verification
