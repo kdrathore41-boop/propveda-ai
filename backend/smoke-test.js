@@ -35,6 +35,8 @@ const required=[
 ['frontend compare UI',front.includes('Compare Properties')&&front.includes('updateCompareSelection()')]
 ,
 ['source registry runtime readiness',read('source-registry.js').includes('runtimePublicFetch')&&read('source-registry.js').includes('RUNTIME_PUBLIC_FETCH_READY')],
+['LGD directory registered as manual source',/\{key:'MP_LGD_DIRECTORY'[\s\S]*?enabled:true,liveApi:false/.test(read('source-registry.js'))],
+['LGD source warns against title inference',read('source-registry.js').includes('never as proof of ownership, title, parcel boundary or legal clearance')],
 ['connector runtime readiness',read('source-connectors.js').includes('runtimePublicFetch')&&read('source-connectors.js').includes('RUNTIME_PUBLIC_FETCH_READY')],
 ['ABPAS runtime fetch',read('source-connectors.js').includes('fetchAbpasLayoutRuntime')&&read('source-connectors.js').includes('PUBLIC_HTML_RUNTIME_FETCH')],
 ['runtime ingest endpoint',server.includes('/source-check/:key/ingest')&&server.includes('SOURCE_EVIDENCE_INGESTED')]
